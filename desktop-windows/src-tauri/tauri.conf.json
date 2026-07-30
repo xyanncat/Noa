@@ -1,6 +1,6 @@
 {
   "productName": "Noa",
-  "version": "0.1.0",
+  "version": "2.2.0",
   "identifier": "com.noa.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -34,7 +34,7 @@
     "active": true,
     "targets": ["nsis"],
     "windows": {
-      "webviewInstallMode": { "type": "downloadBootstrapper" }
+      "webviewInstallMode": { "type": "offlineInstaller" }
     }
   }
 }

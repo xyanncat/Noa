@@ -72,3 +72,18 @@ Checkpoint after Todo 3 (2026-07-30): no reusable skill observations identified.
 **Suggested improvement:** Add a final preview-state check that separately reports source, bundle, served-module, and browser-session evidence; when the session cannot be programmatically reloaded, give the user one explicit hard-refresh action instead of implying the visible tab is current.
 
 **Principle:** A browser tab, a development server, and a built bundle are independent states; validate and communicate each one separately.
+
+### Observation 5: Gate direct native releases on signing prerequisites
+
+**Status:** OPEN
+**Date:** 2026-07-30
+**Session context:** Configuring direct Android APK and Windows installer distribution
+**Skill:** New skill candidate: cross-platform workspace validation
+**Type:** open-source
+**Phase/Area:** Native release configuration
+
+**Issue:** A release APK can compile even when it is unsigned or signed with a development key unless the build configuration explicitly rejects missing signing material. Local hosts may also lack the JDK required to verify Android packaging.
+
+**Suggested improvement:** Add a release-preflight step that treats signing credentials, a readable keystore, target ABI, and host toolchain availability as required build inputs, then make CI fail before publishing if any are absent.
+
+**Principle:** A distributable native binary is not validated by compilation alone; its signing provenance and target-platform constraints must be verified before publication.

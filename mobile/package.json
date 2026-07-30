@@ -1,11 +1,13 @@
 {
   "name": "@noa/mobile",
-  "version": "1.0.0",
+  "version": "2.2.0",
   "private": true,
   "main": "App.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
+    "android:prebuild": "expo prebuild --platform android --no-install",
+    "android:apk": "android\\gradlew.bat -p android assembleRelease",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },

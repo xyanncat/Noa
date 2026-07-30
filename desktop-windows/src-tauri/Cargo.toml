@@ -1,6 +1,6 @@
 [package]
 name = "noa_desktop"
-version = "0.1.0"
+version = "2.2.0"
 description = "Noa native Windows desktop overlay"
 authors = ["Noa"]
 edition = "2021"

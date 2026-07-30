@@ -140,27 +140,37 @@ Noa/
    - **Backend Server**: `python api/main.py`
    - **Web Interface**: `cd ui && npm run dev`
 
-### 📱 Option B: Smartphone Direct Installation (iOS & Android)
+### 📱 Option B: Direct Smartphone Installation — No Expo Go
 
-#### 1. Instant Launch via Expo Go (No Build Required)
-- 🤖 **Android**: [Download on Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
-- 🍎 **iOS**: [Download on Apple App Store](https://apps.apple.com/app/expo-go/id982107779)
+#### 1. Install Noa as a Progressive Web App (Android & iOS)
+1. Open the deployed Noa web interface in Chrome on Android or Safari on iOS.
+2. Choose **Add to Home Screen** (or **Install app** in Chrome).
+3. Launch the new **Noa** home-screen icon for a standalone, full-screen experience. The app shell remains available offline after the first successful load.
 
-Run the tunnel server on your computer:
-```bash
-cd mobile
-npm install
-npx expo start --tunnel
-```
-Scan the generated QR code using your smartphone camera or Expo Go app to launch Noa instantly!
+#### 2. Install the Signed Android APK
+1. Open the [GitHub Releases page](https://github.com/xyanncat/Noa/releases) on an Android device.
+2. Download the `Noa-v2.2.0-Android-arm64.apk` asset for the selected release.
+3. If Android asks, allow installation from the browser or file manager, then tap the downloaded APK to install it. No Expo Go account or app is required.
 
-#### 2. Standalone Build (APK & IPA)
-```bash
-cd mobile
-npm install -g eas-cli
-eas build --platform android --profile preview
-eas build --platform ios --profile preview
-```
+> [!NOTE]
+> iOS does not allow direct APK installation. Use the PWA path above for a home-screen Noa experience on iPhone and iPad.
+
+### 💻 Windows Direct Installation
+
+1. Open the [GitHub Releases page](https://github.com/xyanncat/Noa/releases).
+2. Download `Noa-v2.2.0-Windows-x64-Setup.exe` from the desired release.
+3. Run the installer. It contains the Tauri application and an offline Microsoft WebView2 installer, so it does not depend on an existing WebView2 download.
+
+### 🔐 Maintainer Release Setup
+
+Publishing a GitHub Release tagged `v2.2.0` runs `.github/workflows/release-binaries.yml`, verifies the version metadata, and attaches the signed Android and Windows artifacts. Before publishing, configure these repository secrets:
+
+- `NOA_ANDROID_KEYSTORE_BASE64`: Base64-encoded release `.jks` / `.keystore` file.
+- `NOA_ANDROID_KEYSTORE_PASSWORD`: Keystore password.
+- `NOA_ANDROID_KEY_ALIAS`: Signing-key alias.
+- `NOA_ANDROID_KEY_PASSWORD`: Signing-key password.
+
+The Android job intentionally fails rather than publishing an unsigned or debug-signed APK when any signing secret is missing.
 
 ### 💻 Option C: Manual Installation Steps
 
@@ -201,5 +211,5 @@ npm run tauri dev
 
 Released under the **MIT License**.
 
-- 📦 **Latest Release v2.1.0**: [https://github.com/xyanncat/Noa/releases/tag/v2.1.0](https://github.com/xyanncat/Noa/releases/tag/v2.1.0)
+- 📦 **Latest Release v2.2.0**: [https://github.com/xyanncat/Noa/releases/tag/v2.2.0](https://github.com/xyanncat/Noa/releases/tag/v2.2.0)
 - 🐙 **GitHub Repository**: [https://github.com/xyanncat/Noa](https://github.com/xyanncat/Noa)

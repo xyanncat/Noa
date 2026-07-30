@@ -1,6 +1,6 @@
 {
   "name": "noa-ai-engine",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "workspaces": ["shared", "desktop-windows", "mobile", "ui"],
   "scripts": {

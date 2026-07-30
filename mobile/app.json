@@ -2,7 +2,7 @@
   "expo": {
     "name": "Noa",
     "slug": "noa-mobile",
-    "version": "1.0.0",
+    "version": "2.2.0",
     "scheme": "noa",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "com.noa.mobile",
+      "versionCode": 22,
       "permissions": ["CAMERA", "RECORD_AUDIO", "POST_NOTIFICATIONS"]
     }
   }
