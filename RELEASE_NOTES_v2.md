@@ -64,13 +64,20 @@ npm run tauri dev
 ```
 
 ### 4. 📱 Noa Smartphone App Setup (iOS & Android)
+#### Option 4A: Instant Smartphone Testing via Expo Go (No Build Required)
+1. Download **Expo Go** on your smartphone:
+   - 🤖 **Android**: [Download on Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+   - 🍎 **iOS**: [Download on Apple App Store](https://apps.apple.com/app/expo-go/id982107779)
+2. Start Expo server on your computer:
+   ```bash
+   cd mobile && npx expo start --tunnel
+   ```
+3. Scan the generated QR code with your phone camera or Expo Go app to launch Noa on your smartphone!
+
+#### Option 4B: Standalone Build
 ```bash
 cd mobile
-
-# Install dependencies
 npm install
-
-# Start Expo development server for iOS / Android
 npx expo start
 ```
 
