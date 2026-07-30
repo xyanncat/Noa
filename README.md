@@ -133,31 +133,63 @@ Noa/
 
 ---
 
-## 🚀 Quick Start Guide
+### ⚡ Option A: Automated One-Click Installation
+1. Clone or download the repository.
+2. Double click **`install.bat`** (Windows) or run `./install.sh` (Linux/macOS).
+3. Start the services:
+   - **Backend Server**: `python api/main.py`
+   - **Web Interface**: `cd ui && npm run dev`
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+ and npm / pnpm
+### 📱 Option B: Smartphone Direct Installation (iOS & Android)
 
-### 1. Clone & Setup Backend Engine
+#### 1. Instant Launch via Expo Go (No Build Required)
+- 🤖 **Android**: [Download on Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+- 🍎 **iOS**: [Download on Apple App Store](https://apps.apple.com/app/expo-go/id982107779)
+
+Run the tunnel server on your computer:
+```bash
+cd mobile
+npm install
+npx expo start --tunnel
+```
+Scan the generated QR code using your smartphone camera or Expo Go app to launch Noa instantly!
+
+#### 2. Standalone Build (APK & IPA)
+```bash
+cd mobile
+npm install -g eas-cli
+eas build --platform android --profile preview
+eas build --platform ios --profile preview
+```
+
+### 💻 Option C: Manual Installation Steps
+
+#### 1. Launch Backend Engine
 ```bash
 git clone https://github.com/xyanncat/Noa.git
 cd Noa
 
 # Install backend dependencies
-pip install fastapi uvicorn pydantic
+pip install -r requirements.txt
 
 # Launch Noa Core Backend API
 python api/main.py
 # Server active at http://localhost:8000
 ```
 
-### 2. Launch Liquid Glass Web UI
+#### 2. Launch Liquid Glass Web UI
 ```bash
 cd ui
 npm install
 npm run dev
 # Dashboard active at http://localhost:5173
+```
+
+#### 3. Launch Windows Desktop Client (Tauri v2 + Rust)
+```bash
+cd desktop-windows
+npm install
+npm run tauri dev
 ```
 
 > [!NOTE]
@@ -169,5 +201,5 @@ npm run dev
 
 Released under the **MIT License**.
 
-- 📦 **Official Release v1.0.0**: [https://github.com/xyanncat/Noa/releases/tag/v1.0.0](https://github.com/xyanncat/Noa/releases/tag/v1.0.0)
+- 📦 **Latest Release v2.1.0**: [https://github.com/xyanncat/Noa/releases/tag/v2.1.0](https://github.com/xyanncat/Noa/releases/tag/v2.1.0)
 - 🐙 **GitHub Repository**: [https://github.com/xyanncat/Noa](https://github.com/xyanncat/Noa)
