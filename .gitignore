@@ -1,0 +1,20 @@
+# Runtime secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Python cache and local state
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated data and logs
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+*.log
+
+# Frontend dependencies and build output
+ui/node_modules/
+ui/dist/
