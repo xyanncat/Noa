@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Bot, Send, Brain, Cpu, Wrench, Sparkles, Terminal, Calendar, 
   Mail, GitBranch, Globe, Cloud, Search, CheckCircle2, Clock, 
-  Activity, Layers, Database, ShieldAlert, Mic, Image, RefreshCw, Plus, Play, ChevronLeft, ChevronRight, Zap
+  Activity, Layers, Database, ShieldAlert, Mic, Image, RefreshCw, Plus, Play, ChevronRight, Zap, Trash2
 } from 'lucide-react';
 
 const API_BASE = "http://localhost:8000/api";
@@ -12,7 +12,7 @@ export default function App() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Greetings, Traveler. I am **Noa** (ノア), an autonomous reasoning AI engine. I operate with 5-layer persistent memory, live web research capabilities, an autonomous planner, and a 12-tool ecosystem. How shall I assist you?"
+      content: "Hello! I am **Noa**, your autonomous AI assistant. I have access to internet search, a 5-layer memory engine, an autonomous multi-step planner, and 12 execution tools. How can I assist you today?"
     }
   ]);
   const [inputQuery, setInputQuery] = useState('');
@@ -23,8 +23,8 @@ export default function App() {
   const [autonomousTasks, setAutonomousTasks] = useState([]);
   const [systemHealth, setSystemHealth] = useState(null);
 
-  // Tools carousel & execution state
-  const [selectedToolIdx, setSelectedToolIdx] = useState(0);
+  // Selected tool testing state
+  const [selectedTool, setSelectedTool] = useState('');
   const [toolParams, setToolParams] = useState('{}');
   const [toolOutput, setToolOutput] = useState(null);
 
@@ -33,7 +33,7 @@ export default function App() {
   const [newMemSubject, setNewMemSubject] = useState('');
   const [newMemFact, setNewMemFact] = useState('');
 
-  // Autonomous task state
+  // Autonomous task create state
   const [taskName, setTaskName] = useState('');
   const [taskType, setTaskType] = useState('reminder');
   const [taskSchedule, setTaskSchedule] = useState('daily');
@@ -70,6 +70,7 @@ export default function App() {
       const res = await fetch(`${API_BASE}/tools`);
       const data = await res.json();
       setToolsList(data);
+      if (data.length > 0 && !selectedTool) setSelectedTool(data[0].name);
     } catch (e) {}
   };
 
@@ -80,11 +81,10 @@ export default function App() {
     } catch (e) {}
   };
 
-  const handleSendMessage = async (e) => {
-    e?.preventDefault();
-    if (!inputQuery.trim() || isLoading) return;
+  const handleSendMessage = async (queryText = inputQuery) => {
+    if (!queryText.trim() || isLoading) return;
 
-    const userText = inputQuery;
+    const userText = queryText;
     setInputQuery('');
     setMessages(prev => [...prev, { role: 'user', content: userText }]);
     setIsLoading(true);
@@ -107,14 +107,14 @@ export default function App() {
     } catch (err) {
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: "Network exception: Ensure Noa backend server is online at port 8000." 
+        content: "Error connecting to Noa Engine backend (localhost:8000)." 
       }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleExecuteTool = async (toolName) => {
+  const handleExecuteTool = async () => {
     try {
       let paramsObj = {};
       try { paramsObj = JSON.parse(toolParams); } catch (err) {}
@@ -122,7 +122,7 @@ export default function App() {
       const res = await fetch(`${API_BASE}/tools/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: toolName, params: paramsObj })
+        body: JSON.stringify({ name: selectedTool, params: paramsObj })
       });
       setToolOutput(await res.json());
     } catch (e) {
@@ -168,38 +168,40 @@ export default function App() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '1rem', gap: '1rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '1.25rem', gap: '1.25rem' }}>
       
-      {/* KAMUI Shrine Header */}
-      <header className="kamui-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.75rem', borderBottom: '2px solid rgba(251, 191, 36, 0.4)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      {/* Clean Navbar Header */}
+      <header className="clean-glass-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
           <div style={{ 
-            background: 'linear-gradient(135deg, #e11d48, #9333ea, #fbbf24)', 
-            padding: '0.65rem', 
-            borderRadius: '14px',
-            boxShadow: '0 0 20px rgba(225, 29, 72, 0.5)'
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-cyan))', 
+            padding: '0.55rem', 
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)'
           }}>
-            <Bot size={26} color="#ffffff" />
+            <Bot size={22} color="#ffffff" />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <h1 className="font-cinzel gradient-gold-text" style={{ fontSize: '1.5rem', fontWeight: '900' }}>NOA CORE</h1>
-              <span className="font-cinzel" style={{ fontSize: '0.85rem', color: 'var(--accent-purple)', background: 'rgba(168,85,247,0.15)', padding: '0.1rem 0.5rem', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.3)' }}>
-                ノア ・ 記憶
+              <h1 className="font-outfit gradient-text-primary" style={{ fontSize: '1.35rem', fontWeight: '800', lineHeight: 1 }}>NOA CORE</h1>
+              <span style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', background: 'rgba(56, 189, 248, 0.1)', padding: '0.15rem 0.5rem', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.25)', fontWeight: '600' }}>
+                v1.0.0
               </span>
             </div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Autonomous AI Reasoning Engine with 5 Memory Decks</p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>Autonomous AI Engine with 5-Layer Memory</p>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <nav style={{ display: 'flex', gap: '0.4rem', background: 'rgba(8, 4, 16, 0.7)', padding: '0.3rem', borderRadius: '12px', border: '1px solid var(--border-purple)' }}>
+        {/* Tab Selector Pills */}
+        <nav style={{ display: 'flex', gap: '0.35rem', background: 'rgba(7, 9, 14, 0.6)', padding: '0.3rem', borderRadius: '14px', border: '1px solid var(--card-border)' }}>
           {[
-            { id: 'chat', label: 'Chat Engine', jp: '対話', icon: Sparkles },
-            { id: 'memory', label: 'Memory Deck', jp: '記憶', icon: Brain },
-            { id: 'planner', label: 'Planner Arena', jp: '計画', icon: Cpu },
-            { id: 'tools', label: 'Tools Deck', jp: '道具', icon: Wrench },
-            { id: 'agents', label: 'Autonomous', jp: '自動', icon: Activity }
+            { id: 'chat', label: 'Chat Engine', icon: Sparkles },
+            { id: 'memory', label: '5-Layer Memory', icon: Brain },
+            { id: 'planner', label: 'Planner & Execution', icon: Cpu },
+            { id: 'tools', label: 'Tools Console', icon: Wrench },
+            { id: 'agents', label: 'Autonomous Tasks', icon: Activity }
           ].map(t => {
             const Icon = t.icon;
             const active = activeTab === t.id;
@@ -207,90 +209,78 @@ export default function App() {
               <button
                 key={t.id}
                 onClick={() => setActiveTab(t.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  padding: '0.5rem 0.9rem',
-                  borderRadius: '8px',
-                  border: active ? '1px solid var(--accent-gold)' : '1px solid transparent',
-                  background: active ? 'linear-gradient(135deg, rgba(225, 29, 72, 0.3), rgba(147, 51, 234, 0.4))' : 'transparent',
-                  color: active ? '#ffffff' : 'var(--text-muted)',
-                  cursor: 'pointer',
-                  fontWeight: active ? '700' : '500',
-                  fontSize: '0.82rem',
-                  boxShadow: active ? '0 0 15px rgba(251, 191, 36, 0.3)' : 'none',
-                  transition: 'all 0.25s'
-                }}
+                className={`nav-pill-btn ${active ? 'active' : ''}`}
               >
-                <Icon size={15} color={active ? 'var(--accent-gold)' : 'currentColor'} />
-                <span>{t.label}</span>
-                <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>{t.jp}</span>
+                <Icon size={16} color={active ? 'var(--accent-cyan)' : 'currentColor'} />
+                {t.label}
               </button>
             );
           })}
         </nav>
 
-        {/* Status Badges */}
+        {/* Status Indicators */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <span style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '0.35rem', 
-            background: 'rgba(251, 191, 36, 0.15)', 
-            color: 'var(--accent-gold)', 
+            gap: '0.4rem', 
+            background: 'rgba(16, 185, 129, 0.12)', 
+            color: 'var(--accent-emerald)', 
             padding: '0.35rem 0.75rem', 
             borderRadius: '20px',
-            border: '1px solid rgba(251, 191, 36, 0.4)',
-            fontSize: '0.78rem',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            fontSize: '0.8rem',
             fontWeight: '600'
           }}>
-            <Zap size={14} color="var(--accent-gold)" />
-            {systemHealth?.status === 'online' ? 'Engine Online' : 'Connecting...'}
+            <span className="pulse-dot" />
+            {systemHealth?.status === 'online' ? 'Engine Active' : 'Connecting...'}
+          </span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.04)', padding: '0.35rem 0.75rem', borderRadius: '10px', border: '1px solid var(--card-border)' }}>
+            12 Tools Loaded
           </span>
         </div>
       </header>
 
-      {/* Main Body Content */}
+      {/* Main View Area */}
       <main style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
         
         {/* TAB 1: CHAT ENGINE */}
         {activeTab === 'chat' && (
-          <div style={{ display: 'flex', width: '100%', gap: '1rem' }}>
+          <div style={{ display: 'flex', width: '100%', gap: '1.25rem' }}>
             
-            {/* Conversation Window */}
-            <div className="kamui-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <div style={{ flex: 1, padding: '1.25rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Conversation Stream Column */}
+            <div className="clean-glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ flex: 1, padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
                 {messages.map((m, idx) => (
                   <div key={idx} style={{ 
                     display: 'flex', 
                     flexDirection: 'column', 
                     alignItems: m.role === 'user' ? 'flex-end' : 'flex-start' 
                   }}>
-                    <div className="kamui-card" style={{
+                    <div className="clean-card" style={{
                       maxWidth: '82%',
                       padding: '1rem 1.25rem',
                       borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                       background: m.role === 'user' 
-                        ? 'linear-gradient(135deg, rgba(225, 29, 72, 0.4), rgba(147, 51, 234, 0.4))' 
-                        : 'var(--card-bg)',
-                      border: m.role === 'user' ? '1px solid var(--accent-crimson)' : '1px solid var(--border-purple)',
+                        ? 'linear-gradient(135deg, var(--accent-primary), #3b82f6)' 
+                        : 'rgba(18, 26, 42, 0.7)',
+                      border: m.role === 'user' ? 'none' : '1px solid var(--card-border)',
                       color: '#ffffff',
                       lineHeight: '1.6',
                       fontSize: '0.92rem'
                     }}>
                       {m.content}
 
-                      {/* Display Plan Summary */}
+                      {/* Display Plan Summary if generated */}
                       {m.plan && (
-                        <div style={{ marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(251,191,36,0.2)', fontSize: '0.82rem' }}>
-                          <div style={{ fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <div style={{ marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '0.82rem' }}>
+                          <div style={{ fontWeight: '600', color: 'var(--accent-cyan)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                             <Cpu size={15} /> Goal: {m.plan.goal}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                             {m.plan.steps.map((s, sIdx) => (
-                              <div key={sIdx} style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                <CheckCircle2 size={13} color="var(--accent-gold)" />
+                              <div key={sIdx} style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <CheckCircle2 size={13} color="var(--accent-emerald)" />
                                 <span>Step {s.step_number}: {s.description} {s.tool_name !== 'none' && `[${s.tool_name}]`}</span>
                               </div>
                             ))}
@@ -303,17 +293,45 @@ export default function App() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Chat Input */}
-              <form onSubmit={handleSendMessage} style={{ padding: '1rem', borderTop: '1px solid var(--border-purple)', display: 'flex', gap: '0.75rem' }}>
+              {/* Action Suggestion Pills */}
+              <div style={{ padding: '0.5rem 1.25rem', display: 'flex', gap: '0.5rem', overflowX: 'auto', borderTop: '1px solid var(--card-border)' }}>
+                {[
+                  "☀️ Check weather in San Francisco",
+                  "📰 Search latest AI news",
+                  "📅 Remind me to review code at 5 PM",
+                  "📁 List workspace files"
+                ].map((promptText, pIdx) => (
+                  <button
+                    key={pIdx}
+                    onClick={() => handleSendMessage(promptText)}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.04)',
+                      border: '1px solid var(--card-border)',
+                      borderRadius: '16px',
+                      padding: '0.35rem 0.75rem',
+                      color: 'var(--text-secondary)',
+                      fontSize: '0.78rem',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {promptText}
+                  </button>
+                ))}
+              </div>
+
+              {/* Chat Input Bar */}
+              <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} style={{ padding: '1rem', borderTop: '1px solid var(--card-border)', display: 'flex', gap: '0.75rem' }}>
                 <input
                   type="text"
-                  placeholder="Ask Noa anything... (e.g. 'Search for French AI news and check weather in Paris')"
+                  placeholder="Ask Noa anything..."
                   value={inputQuery}
                   onChange={(e) => setInputQuery(e.target.value)}
                   style={{
                     flex: 1,
-                    background: 'rgba(8, 4, 16, 0.6)',
-                    border: '1px solid var(--border-purple)',
+                    background: 'rgba(7, 9, 14, 0.6)',
+                    border: '1px solid var(--card-border)',
                     borderRadius: '12px',
                     padding: '0.85rem 1.25rem',
                     color: '#ffffff',
@@ -325,68 +343,69 @@ export default function App() {
                   type="submit"
                   disabled={isLoading}
                   style={{
-                    background: 'linear-gradient(135deg, var(--accent-crimson), var(--accent-gold))',
+                    background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-cyan))',
                     border: 'none',
                     borderRadius: '12px',
                     padding: '0.85rem 1.5rem',
                     color: '#ffffff',
-                    fontWeight: '700',
+                    fontWeight: '600',
                     cursor: isLoading ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 0 15px rgba(225, 29, 72, 0.4)'
+                    gap: '0.4rem',
+                    boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)'
                   }}
                 >
                   {isLoading ? <RefreshCw size={18} className="pulse-animation" /> : <Send size={18} />}
-                  Execute
+                  Send
                 </button>
               </form>
             </div>
 
-            {/* Quick Context Card Panel */}
-            <div className="kamui-panel" style={{ width: '320px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <h3 className="font-cinzel gradient-gold-text" style={{ fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Brain size={18} color="var(--accent-gold)" />
-                ACTIVE MEMORY DECK
+            {/* Memory Sidebar Panel */}
+            <div className="clean-glass-panel" style={{ width: '330px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <h3 className="font-outfit" style={{ fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Brain size={18} color="var(--accent-purple)" />
+                Working Context
               </h3>
               
-              <div className="kamui-card">
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Working Memory Turns</span>
-                <p style={{ fontSize: '1.3rem', fontWeight: '800', color: 'var(--accent-purple)' }}>
-                  {memoryState?.working?.turn_count || 0} Turns Active
+              <div className="clean-card">
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Working Memory Turns</span>
+                <p style={{ fontSize: '1.3rem', fontWeight: '800', color: 'var(--accent-cyan)', marginTop: '0.1rem' }}>
+                  {memoryState?.working?.turn_count || 0} Active Turns
                 </p>
               </div>
 
-              <div className="kamui-card" style={{ flex: 1, overflowY: 'auto' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', display: 'block', marginBottom: '0.5rem', fontWeight: '700' }}>Long-Term Memories</span>
+              <div className="clean-card" style={{ flex: 1, overflowY: 'auto' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Long-Term Memories</span>
                 {memoryState?.long_term?.length > 0 ? (
                   memoryState.long_term.map((m, idx) => (
                     <div key={idx} style={{ marginBottom: '0.5rem', fontSize: '0.8rem', borderBottom: '1px dashed rgba(255,255,255,0.08)', paddingBottom: '0.35rem' }}>
-                      <span style={{ color: 'var(--accent-crimson)', fontWeight: '700' }}>[{m.category}]</span> {m.key}: {m.value}
+                      <span style={{ color: 'var(--accent-primary)', fontWeight: '700' }}>[{m.category}]</span> {m.key}: {m.value}
                     </div>
                   ))
                 ) : (
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>No persistent memories stored.</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>No persistent long-term memories saved.</p>
                 )}
               </div>
             </div>
+
           </div>
         )}
 
-        {/* TAB 2: 5-LAYER MEMORY CAROUSEL DECK */}
+        {/* TAB 2: 5-LAYER MEMORY INSPECTOR */}
         {activeTab === 'memory' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.25rem', overflowY: 'auto' }}>
             
-            {/* Memory Add Form */}
-            <form onSubmit={handleAddMemory} className="kamui-panel" style={{ padding: '1rem 1.25rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-              <span className="font-cinzel gradient-gold-text" style={{ fontWeight: '700', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Plus size={16} /> Add Memory Card:
+            {/* Add Memory Form */}
+            <form onSubmit={handleAddMemory} className="clean-glass-panel" style={{ padding: '1rem 1.25rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <span className="font-outfit" style={{ fontWeight: '700', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-cyan)' }}>
+                <Plus size={16} /> Insert Memory Record:
               </span>
               <select 
                 value={newMemLayer} 
                 onChange={(e) => setNewMemLayer(e.target.value)}
-                style={{ background: 'rgba(8, 4, 16, 0.8)', color: '#fff', border: '1px solid var(--border-purple)', padding: '0.5rem', borderRadius: '8px' }}
+                style={{ background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--card-border)', padding: '0.55rem', borderRadius: '8px' }}
               >
                 <option value="long_term">Long-Term Memory</option>
                 <option value="semantic">Semantic Memory (Vectorized)</option>
@@ -396,95 +415,144 @@ export default function App() {
                 placeholder="Category / Subject"
                 value={newMemSubject}
                 onChange={(e) => setNewMemSubject(e.target.value)}
-                style={{ background: 'rgba(8, 4, 16, 0.8)', color: '#fff', border: '1px solid var(--border-purple)', padding: '0.5rem 0.75rem', borderRadius: '8px' }}
+                style={{ background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--card-border)', padding: '0.55rem 0.75rem', borderRadius: '8px' }}
               />
               <input
                 type="text"
                 placeholder="Fact or Preference details..."
                 value={newMemFact}
                 onChange={(e) => setNewMemFact(e.target.value)}
-                style={{ flex: 1, background: 'rgba(8, 4, 16, 0.8)', color: '#fff', border: '1px solid var(--border-purple)', padding: '0.5rem 0.75rem', borderRadius: '8px' }}
+                style={{ flex: 1, background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--card-border)', padding: '0.55rem 0.75rem', borderRadius: '8px' }}
               />
-              <button type="submit" style={{ background: 'linear-gradient(135deg, var(--accent-purple), var(--accent-crimson))', color: '#fff', border: 'none', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}>
-                Embed Card
+              <button type="submit" style={{ background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-purple))', color: '#fff', border: 'none', padding: '0.55rem 1.25rem', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                Save Entry
               </button>
             </form>
 
-            {/* 3D Memory Card Carousel */}
-            <div className="card-carousel-container">
-              {[
-                { title: 'Working Memory', jp: '作業記憶', count: memoryState?.working?.history?.length || 0, color: 'var(--accent-cyan)', items: memoryState?.working?.history },
-                { title: 'Short-Term', jp: '短期記憶', count: memoryState?.short_term?.recent_tasks?.length || 0, color: 'var(--accent-indigo)', items: memoryState?.short_term?.recent_tasks },
-                { title: 'Long-Term', jp: '長期記憶', count: memoryState?.long_term?.length || 0, color: 'var(--accent-purple)', items: memoryState?.long_term },
-                { title: 'Semantic (Vector)', jp: '知識記憶', count: memoryState?.semantic?.length || 0, color: 'var(--accent-crimson)', items: memoryState?.semantic },
-                { title: 'Episodic Logs', jp: '体験記憶', count: memoryState?.episodic?.length || 0, color: 'var(--accent-gold)', items: memoryState?.episodic }
-              ].map((card, idx) => (
-                <div key={idx} className="carousel-card-3d">
-                  <div>
-                    <span className="card-badge" style={{ color: card.color, borderColor: card.color }}>{card.jp}</span>
-                    <h3 className="font-cinzel" style={{ fontSize: '1.05rem', fontWeight: '700', marginTop: '0.4rem', color: '#ffffff' }}>{card.title}</h3>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{card.count} Cards Stored</p>
-                  </div>
-                  <div style={{ flex: 1, overflowY: 'auto', margin: '0.75rem 0', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                    {card.items?.slice(0, 4).map((item, i) => (
-                      <div key={i} style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.04)', padding: '0.35rem 0.5rem', borderRadius: '6px', borderLeft: `2px solid ${card.color}` }}>
-                        {item.fact || item.key || item.summary || item.content?.slice(0, 30)}
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ fontSize: '0.7rem', color: card.color, textAlign: 'center', fontWeight: '700' }}>
-                    Layer {idx + 1} Active
-                  </div>
+            {/* 5 Layer Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
+              
+              {/* Layer 1: Working Memory */}
+              <div className="clean-glass-panel" style={{ padding: '1.25rem', height: '270px', display: 'flex', flexDirection: 'column' }}>
+                <h3 className="font-outfit" style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-cyan)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Layers size={16} /> 1. Working Memory
+                </h3>
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  {memoryState?.working?.history?.map((h, i) => (
+                    <div key={i} style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.03)', padding: '0.4rem 0.6rem', borderRadius: '6px' }}>
+                      <strong style={{ color: h.role === 'user' ? 'var(--accent-cyan)' : 'var(--accent-purple)' }}>{h.role}:</strong> {h.content.slice(0, 70)}...
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
 
+              {/* Layer 2: Short-Term Memory */}
+              <div className="clean-glass-panel" style={{ padding: '1.25rem', height: '270px', display: 'flex', flexDirection: 'column' }}>
+                <h3 className="font-outfit" style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-primary)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Clock size={16} /> 2. Short-Term Memory
+                </h3>
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  {memoryState?.short_term?.recent_tasks?.map((t, i) => (
+                    <div key={i} style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.03)', padding: '0.4rem 0.6rem', borderRadius: '6px' }}>
+                      <span style={{ color: 'var(--accent-primary)' }}>{t.key}:</span> {t.value}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Layer 3: Long-Term Memory */}
+              <div className="clean-glass-panel" style={{ padding: '1.25rem', height: '270px', display: 'flex', flexDirection: 'column' }}>
+                <h3 className="font-outfit" style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-purple)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Database size={16} /> 3. Long-Term Memory
+                </h3>
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  {memoryState?.long_term?.map((lt, i) => (
+                    <div key={i} style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.03)', padding: '0.4rem 0.6rem', borderRadius: '6px' }}>
+                      <span style={{ color: 'var(--accent-purple)', fontWeight: '700' }}>[{lt.category}]</span> {lt.key}: {lt.value}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Layer 4: Semantic Memory */}
+              <div className="clean-glass-panel" style={{ padding: '1.25rem', height: '270px', display: 'flex', flexDirection: 'column', gridColumn: 'span 2' }}>
+                <h3 className="font-outfit" style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-rose)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Brain size={16} /> 4. Semantic Memory (Vector Search Base)
+                </h3>
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  {memoryState?.semantic?.map((sm, i) => (
+                    <div key={i} style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 0.75rem', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <strong style={{ color: 'var(--accent-rose)' }}>{sm.subject}:</strong> {sm.fact}
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>
+                        {sm.source}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Layer 5: Episodic Memory */}
+              <div className="clean-glass-panel" style={{ padding: '1.25rem', height: '270px', display: 'flex', flexDirection: 'column' }}>
+                <h3 className="font-outfit" style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Activity size={16} /> 5. Episodic Memory
+                </h3>
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  {memoryState?.episodic?.map((ep, i) => (
+                    <div key={i} style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.03)', padding: '0.4rem 0.6rem', borderRadius: '6px' }}>
+                      <span style={{ color: 'var(--accent-gold)', fontWeight: '700' }}>[{ep.event_type}]</span> {ep.summary}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
           </div>
         )}
 
         {/* TAB 3: PLANNER ARENA */}
         {activeTab === 'planner' && (
-          <div className="kamui-panel" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto' }}>
-            <h2 className="font-cinzel gradient-gold-text" style={{ fontSize: '1.3rem', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Cpu size={24} color="var(--accent-gold)" /> AUTONOMOUS PLANNER ARENA
+          <div className="clean-glass-panel" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', overflowY: 'auto' }}>
+            <h2 className="font-outfit gradient-text-primary" style={{ fontSize: '1.25rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Cpu size={22} color="var(--accent-cyan)" /> Autonomous Planner Pipeline
             </h2>
 
             {currentPlan ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div className="kamui-card" style={{ borderLeft: '4px solid var(--accent-gold)' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: '700' }}>Target Goal</span>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: '700', marginTop: '0.2rem' }}>{currentPlan.goal}</h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>{currentPlan.thought}</p>
+                <div className="clean-card" style={{ borderLeft: '4px solid var(--accent-primary)' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Target Goal</span>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginTop: '0.2rem' }}>{currentPlan.goal}</h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.3rem' }}>{currentPlan.thought}</p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  <h4 className="font-cinzel" style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--accent-purple)' }}>Execution Cards</h4>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: '700' }}>Step Execution Pipeline</h4>
                   {currentPlan.steps.map((step, idx) => {
                     const result = currentPlan.results?.find(r => r.step_number === step.step_number);
                     return (
-                      <div key={idx} className="kamui-card" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                      <div key={idx} className="clean-card" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                         <div style={{ 
-                          background: 'linear-gradient(135deg, var(--accent-crimson), var(--accent-gold))', 
+                          background: 'var(--accent-primary)', 
                           color: '#fff', 
                           fontWeight: '800', 
                           borderRadius: '50%', 
-                          width: 32, 
-                          height: 32, 
+                          width: 30, 
+                          height: 30, 
                           display: 'flex', 
                           alignItems: 'center', 
                           justifyContent: 'center',
-                          fontSize: '0.9rem',
-                          boxShadow: '0 0 10px rgba(225,29,72,0.4)'
+                          fontSize: '0.85rem'
                         }}>
                           {step.step_number}
                         </div>
                         <div style={{ flex: 1 }}>
-                          <h5 style={{ fontSize: '0.95rem', fontWeight: '700' }}>{step.description}</h5>
-                          <p style={{ fontSize: '0.8rem', color: 'var(--accent-gold)', marginTop: '0.1rem' }}>
+                          <h5 style={{ fontSize: '0.92rem', fontWeight: '700' }}>{step.description}</h5>
+                          <p style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', marginTop: '0.1rem' }}>
                             Tool: <code>{step.tool_name}</code>
                           </p>
                           {result && (
-                            <div style={{ marginTop: '0.5rem', background: 'rgba(0,0,0,0.6)', padding: '0.6rem', borderRadius: '8px', fontSize: '0.8rem', fontFamily: 'monospace', color: '#34d399' }}>
+                            <div style={{ marginTop: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.6rem', borderRadius: '8px', fontSize: '0.8rem', fontFamily: 'monospace', color: 'var(--accent-emerald)' }}>
                               <strong>Result:</strong> {JSON.stringify(result.output)}
                             </div>
                           )}
@@ -496,105 +564,76 @@ export default function App() {
               </div>
             ) : (
               <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-                <Cpu size={56} style={{ opacity: 0.3, marginBottom: '1rem' }} />
-                <p style={{ fontSize: '1rem' }}>No active plan execution loaded. Ask Noa a multi-step query in the Chat Engine!</p>
+                <Cpu size={52} style={{ opacity: 0.25, marginBottom: '1rem' }} />
+                <p style={{ fontSize: '0.95rem' }}>No active plan execution loaded. Ask Noa a multi-step query in the Chat Engine!</p>
               </div>
             )}
           </div>
         )}
 
-        {/* TAB 4: 3D TOOLS CAROUSEL DECK */}
+        {/* TAB 4: TOOLS CONSOLE */}
         {activeTab === 'tools' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.25rem', overflowY: 'auto' }}>
-            
-            {/* 3D Tools Cards Carousel */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem' }}>
-              <h3 className="font-cinzel gradient-gold-text" style={{ fontSize: '1.2rem', fontWeight: '800' }}>12 TOOL SYSTEM DECK</h3>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button 
-                  onClick={() => setSelectedToolIdx(prev => Math.max(0, prev - 1))}
-                  style={{ background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--border-purple)', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer' }}
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <button 
-                  onClick={() => setSelectedToolIdx(prev => Math.min(toolsList.length - 1, prev + 1))}
-                  style={{ background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--border-purple)', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer' }}
-                >
-                  <ChevronRight size={20} />
-                </button>
-              </div>
-            </div>
-
-            <div className="card-carousel-container" style={{ overflowX: 'auto', padding: '1rem 0' }}>
-              {toolsList.map((t, idx) => {
-                const isSelected = selectedToolIdx === idx;
-                return (
-                  <div
+          <div style={{ flex: 1, display: 'flex', gap: '1.25rem' }}>
+            <div className="clean-glass-panel" style={{ width: '320px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <h3 className="font-outfit" style={{ fontSize: '1rem', fontWeight: '700' }}>Registered Tools ({toolsList.length})</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1, overflowY: 'auto' }}>
+                {toolsList.map((t, idx) => (
+                  <button
                     key={idx}
-                    className="carousel-card-3d"
-                    onClick={() => setSelectedToolIdx(idx)}
+                    onClick={() => setSelectedTool(t.name)}
                     style={{
-                      borderColor: isSelected ? 'var(--accent-gold)' : 'var(--border-purple)',
-                      transform: isSelected ? 'translateY(-12px) scale(1.06)' : 'scale(0.95)',
-                      boxShadow: isSelected ? 'var(--glow-gold)' : 'none'
+                      textAlign: 'left',
+                      padding: '0.75rem',
+                      borderRadius: '10px',
+                      border: selectedTool === t.name ? '1px solid var(--accent-primary)' : '1px solid var(--card-border)',
+                      background: selectedTool === t.name ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
                     }}
                   >
-                    <div>
-                      <span className="card-badge">TOOL {idx + 1}</span>
-                      <h3 className="font-cinzel" style={{ fontSize: '1.1rem', fontWeight: '700', marginTop: '0.5rem', color: isSelected ? 'var(--accent-gold)' : '#fff' }}>
-                        {t.name}
-                      </h3>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.3rem', lineHeight: '1.4' }}>
-                        {t.description}
-                      </p>
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--accent-purple)', fontWeight: '700', textAlign: 'center' }}>
-                      {isSelected ? 'ACTIVE SELECTION' : 'CLICK TO TEST'}
-                    </div>
-                  </div>
-                );
-              })}
+                    <div style={{ fontWeight: '700', fontSize: '0.85rem' }}>{t.name}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t.description.slice(0, 45)}...</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Selected Tool Execution Box */}
-            {toolsList[selectedToolIdx] && (
-              <div className="kamui-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--accent-gold)' }}>
-                  Execute Tool: {toolsList[selectedToolIdx].name}
-                </h4>
-                <div>
-                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem' }}>Parameters (JSON):</label>
-                  <textarea
-                    rows={3}
-                    value={toolParams}
-                    onChange={(e) => setToolParams(e.target.value)}
-                    style={{ width: '100%', background: 'rgba(8, 4, 16, 0.8)', color: '#fff', border: '1px solid var(--border-purple)', borderRadius: '8px', padding: '0.75rem', fontFamily: 'monospace' }}
-                  />
-                </div>
-                <button
-                  onClick={() => handleExecuteTool(toolsList[selectedToolIdx].name)}
-                  style={{ background: 'linear-gradient(135deg, var(--accent-crimson), var(--accent-gold))', color: '#fff', border: 'none', padding: '0.75rem', borderRadius: '8px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
-                >
-                  <Play size={16} /> Execute Tool Card
-                </button>
+            <div className="clean-glass-panel" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <h3 className="font-outfit" style={{ fontSize: '1.1rem', fontWeight: '700' }}>Execute Tool: {selectedTool}</h3>
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Parameters (JSON):</label>
+                <textarea
+                  rows={4}
+                  value={toolParams}
+                  onChange={(e) => setToolParams(e.target.value)}
+                  style={{ width: '100%', background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--card-border)', borderRadius: '10px', padding: '0.75rem', fontFamily: 'monospace' }}
+                />
+              </div>
+              <button
+                onClick={handleExecuteTool}
+                style={{ background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-cyan))', color: '#fff', border: 'none', padding: '0.75rem', borderRadius: '10px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+              >
+                <Play size={16} /> Execute Tool Sandbox
+              </button>
 
-                {toolOutput && (
-                  <pre style={{ background: 'rgba(0,0,0,0.6)', padding: '1rem', borderRadius: '8px', color: '#34d399', fontSize: '0.85rem' }}>
+              {toolOutput && (
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                  <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Output:</label>
+                  <pre style={{ background: 'rgba(0,0,0,0.6)', padding: '1rem', borderRadius: '10px', color: 'var(--accent-emerald)', fontSize: '0.85rem' }}>
                     {JSON.stringify(toolOutput, null, 2)}
                   </pre>
-                )}
-              </div>
-            )}
-
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* TAB 5: AUTONOMOUS SHRINE */}
+        {/* TAB 5: AUTONOMOUS TASK MANAGER */}
         {activeTab === 'agents' && (
-          <div style={{ flex: 1, display: 'flex', gap: '1rem' }}>
-            <div className="kamui-panel" style={{ width: '360px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <h3 className="font-cinzel gradient-gold-text" style={{ fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{ flex: 1, display: 'flex', gap: '1.25rem' }}>
+            <div className="clean-glass-panel" style={{ width: '360px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <h3 className="font-outfit" style={{ fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Plus size={18} /> Schedule Task
               </h3>
               <form onSubmit={handleCreateTask} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -603,12 +642,12 @@ export default function App() {
                   placeholder="Task title (e.g. Check AI News)"
                   value={taskName}
                   onChange={(e) => setTaskName(e.target.value)}
-                  style={{ background: 'rgba(8, 4, 16, 0.8)', color: '#fff', border: '1px solid var(--border-purple)', padding: '0.65rem', borderRadius: '8px' }}
+                  style={{ background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--card-border)', padding: '0.65rem', borderRadius: '8px' }}
                 />
                 <select
                   value={taskType}
                   onChange={(e) => setTaskType(e.target.value)}
-                  style={{ background: 'rgba(8, 4, 16, 0.8)', color: '#fff', border: '1px solid var(--border-purple)', padding: '0.65rem', borderRadius: '8px' }}
+                  style={{ background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--card-border)', padding: '0.65rem', borderRadius: '8px' }}
                 >
                   <option value="reminder">Reminder Alert</option>
                   <option value="news_monitor">Topic News Monitor</option>
@@ -616,29 +655,29 @@ export default function App() {
                 </select>
                 <input
                   type="text"
-                  placeholder="Schedule / Interval (e.g. daily, hourly)"
+                  placeholder="Schedule (e.g. daily, hourly)"
                   value={taskSchedule}
                   onChange={(e) => setTaskSchedule(e.target.value)}
-                  style={{ background: 'rgba(8, 4, 16, 0.8)', color: '#fff', border: '1px solid var(--border-purple)', padding: '0.65rem', borderRadius: '8px' }}
+                  style={{ background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--card-border)', padding: '0.65rem', borderRadius: '8px' }}
                 />
-                <button type="submit" style={{ background: 'linear-gradient(135deg, var(--accent-purple), var(--accent-gold))', color: '#fff', border: 'none', padding: '0.75rem', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}>
-                  Schedule Autonomous Task
+                <button type="submit" style={{ background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-purple))', color: '#fff', border: 'none', padding: '0.75rem', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                  Create Task
                 </button>
               </form>
             </div>
 
-            <div className="kamui-panel" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <h3 className="font-cinzel gradient-gold-text" style={{ fontSize: '1.1rem', fontWeight: '800' }}>Active Background Tasks</h3>
+            <div className="clean-glass-panel" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <h3 className="font-outfit" style={{ fontSize: '1.1rem', fontWeight: '700' }}>Active Background Tasks</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1, overflowY: 'auto' }}>
                 {autonomousTasks.map((t, idx) => (
-                  <div key={idx} className="kamui-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div key={idx} className="clean-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <h4 style={{ fontSize: '0.95rem', fontWeight: '700' }}>{t.task_name}</h4>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                        Type: <span style={{ color: 'var(--accent-gold)' }}>{t.task_type}</span> | Schedule: {t.cron_or_interval}
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                        Type: <span style={{ color: 'var(--accent-cyan)' }}>{t.task_type}</span> | Schedule: {t.cron_or_interval}
                       </p>
                     </div>
-                    <span className="card-badge" style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', borderColor: 'rgba(34, 197, 94, 0.4)' }}>
+                    <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-emerald)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.25rem 0.65rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '600' }}>
                       {t.status}
                     </span>
                   </div>
