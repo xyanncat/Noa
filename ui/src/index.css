@@ -1,20 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --bg-obsidian: #050608;
-  --bg-panel: #0a0d12;
-  --bg-panel-light: #111620;
-  --border-muted: rgba(255, 255, 255, 0.07);
-  --border-active: #00ff9d;
+  --bg-ambient: linear-gradient(135deg, #e0d7f4 0%, #edd8ee 40%, #dcd3f5 100%);
+  --app-shell-bg: #ffffff;
+  --sidebar-bg: #f8f6fc;
+  --sidebar-border: rgba(0, 0, 0, 0.05);
   
-  --neon-mint: #00ff9d;
-  --neon-cyan: #00e5ff;
-  --neon-amber: #ffb700;
-  --neon-red: #ff3366;
+  --purple-primary: #7c3aed;
+  --purple-light: #ede9fe;
+  --purple-tint: #f5f3ff;
+  --purple-glow: rgba(124, 58, 237, 0.25);
   
-  --text-head: #ffffff;
-  --text-body: #94a3b8;
-  --text-sub: #475569;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --btn-black: #0f0f11;
+  --card-shadow: 0 10px 30px rgba(120, 100, 180, 0.08);
 }
 
 * {
@@ -24,116 +26,110 @@
 }
 
 body {
-  background-color: var(--bg-obsidian);
-  background-image: 
-    linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 157, 0.03) 1px, transparent 1px);
-  background-size: 32px 32px;
-  color: var(--text-body);
-  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg-ambient);
+  background-attachment: fixed;
+  color: var(--text-dark);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   min-height: 100vh;
-  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow: hidden;
 }
 
-.font-hud {
-  font-family: 'Chakra Petch', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+/* App Main Container Shell matching Cortex UI */
+.cortex-shell {
+  width: 100%;
+  max-width: 1440px;
+  height: 90vh;
+  background: var(--app-shell-bg);
+  border-radius: 28px;
+  box-shadow: 0 25px 70px rgba(100, 80, 160, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.6);
+  display: flex;
+  overflow: hidden;
 }
 
-.font-mono {
-  font-family: 'IBM Plex Mono', monospace;
+/* Sidebar Styling */
+.cortex-sidebar {
+  width: 260px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1rem;
+  gap: 1.25rem;
 }
 
-/* Tactical HUD Panel */
-.hud-panel {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-muted);
-  border-radius: 4px;
-  position: relative;
+/* 3D Iridescent Floating Purple Orb Animation */
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 15px 30px rgba(168, 85, 247, 0.4)); }
+  50% { transform: translateY(-10px) scale(1.05); filter: drop-shadow(0 25px 40px rgba(168, 85, 247, 0.6)); }
+}
+
+.purple-orb {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #f472b6 0%, #c084fc 40%, #7c3aed 85%, #4c1d95 100%);
+  animation: orbFloat 5s ease-in-out infinite;
+  margin: 0 auto;
+}
+
+/* Prompt Console Container */
+.cortex-prompt-box {
+  background: #fdfcff;
+  border: 1px solid #e9e5f5;
+  border-radius: 24px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 12px 35px rgba(140, 120, 200, 0.08);
+  transition: all 0.25s ease;
+}
+
+.cortex-prompt-box:focus-within {
+  border-color: #c084fc;
+  box-shadow: 0 15px 40px rgba(168, 85, 247, 0.15);
+}
+
+/* Action Pill Buttons */
+.pill-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.hud-panel::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  width: 8px;
-  height: 8px;
-  border-top: 2px solid var(--neon-mint);
-  border-left: 2px solid var(--neon-mint);
+.pill-purple {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
 }
 
-.hud-panel::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  right: -1px;
-  width: 8px;
-  height: 8px;
-  border-bottom: 2px solid var(--neon-mint);
-  border-right: 2px solid var(--neon-mint);
+.pill-purple:hover {
+  background: #e9d5ff;
 }
 
-.hud-panel:hover {
-  border-color: rgba(0, 255, 157, 0.3);
-}
-
-/* Mechanical Tab Buttons */
-.hud-tab-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-body);
-  padding: 0.5rem 1rem;
-  font-family: 'Chakra Petch', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
+/* Action Cards Grid */
+.cortex-card {
+  background: #ffffff;
+  border: 1px solid #f1f0f7;
+  border-radius: 20px;
+  padding: 1.15rem;
+  box-shadow: var(--card-shadow);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: all 0.15s ease;
+  transition: all 0.25s ease;
 }
 
-.hud-tab-btn:hover {
-  color: var(--neon-mint);
-  background: rgba(0, 255, 157, 0.05);
-}
-
-.hud-tab-btn.active {
-  background: rgba(0, 255, 157, 0.1);
-  border: 1px solid var(--neon-mint);
-  color: var(--neon-mint);
-  box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
-}
-
-/* Neon Telemetry Badges */
-.badge-mint {
-  background: rgba(0, 255, 157, 0.1);
-  color: var(--neon-mint);
-  border: 1px solid rgba(0, 255, 157, 0.3);
-  padding: 0.2rem 0.5rem;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-.badge-cyan {
-  background: rgba(0, 229, 255, 0.1);
-  color: var(--neon-cyan);
-  border: 1px solid rgba(0, 229, 255, 0.3);
-  padding: 0.2rem 0.5rem;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-/* Terminal Console Line */
-.terminal-line {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.85rem;
-  line-height: 1.6;
+.cortex-card:hover {
+  transform: translateY(-3px);
+  border-color: #d8b4fe;
+  box-shadow: 0 15px 35px rgba(168, 85, 247, 0.12);
 }
 
 /* Custom Scrollbars */
@@ -142,11 +138,9 @@ body {
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-obsidian);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-mint);
+  background: #cbd5e1;
+  border-radius: 4px;
 }
