@@ -137,6 +137,7 @@ class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=settings.MAX_REQUEST_CHARS)
     session_id: str = Field(default="default_session", min_length=1, max_length=64)
     remember: bool = False
+    effort: Literal["low", "standard", "high"] = "standard"
 
 
 class MemoryAddRequest(BaseModel):
@@ -228,6 +229,7 @@ def chat_endpoint(request: ChatRequest):
         request.message.strip(),
         request.session_id,
         persist_preferences=request.remember,
+        effort=request.effort,
     )
 
 
@@ -282,6 +284,7 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                     message=incoming.get("message", ""),
                     session_id=incoming.get("session_id") or session_id,
                     remember=bool(incoming.get("remember", False)),
+                    effort=incoming.get("effort", "standard"),
                 )
             except ValidationError as exc:
                 await websocket.send_json(
@@ -304,8 +307,9 @@ async def websocket_chat_endpoint(websocket: WebSocket):
                     orchestrator.process_request,
                     chat_request.message.strip(),
                     chat_request.session_id,
-                    chat_request.remember,
-                    forward_event,
+                    persist_preferences=chat_request.remember,
+                    event_handler=forward_event,
+                    effort=chat_request.effort,
                 )
                 await websocket.send_json({"type": "chat.completed", "request_id": request_id, "data": response})
             except Exception:

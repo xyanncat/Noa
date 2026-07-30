@@ -11,11 +11,22 @@ class Brain:
     def __init__(self):
         self.persona = SYSTEM_PERSONA
 
-    def reason_and_plan(self, user_query: str, session_id: str = "default_session") -> PlanExecution:
+    def reason_and_plan(
+        self,
+        user_query: str,
+        session_id: str = "default_session",
+        effort: str = "standard",
+    ) -> PlanExecution:
         memory_context = memory_manager.get_unified_context(user_query, session_id)
-        return autonomous_planner.create_plan(user_query, memory_context)
+        return autonomous_planner.create_plan(user_query, memory_context, effort)
 
-    def synthesize_response(self, user_query: str, plan: PlanExecution, session_id: str) -> str:
+    def synthesize_response(
+        self,
+        user_query: str,
+        plan: PlanExecution,
+        session_id: str,
+        effort: str = "standard",
+    ) -> str:
         results = "\n".join(
             f"Step {result.step_number} ({result.tool_name}, {'success' if result.success else 'failed'}): {result.output}"
             for result in plan.results
@@ -36,6 +47,7 @@ Give a concise, helpful answer. Be transparent about failed or blocked steps and
             system_prompt=self.persona,
             user_prompt=prompt,
             history=memory_manager.get_working_history(session_id),
+            effort=effort,
         )
 
 

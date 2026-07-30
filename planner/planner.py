@@ -16,7 +16,12 @@ PlanEventHandler = Callable[[str, Dict[str, Any]], None]
 class AutonomousPlanner:
     """Create validated, safety-scoped plans and execute their approved tool calls."""
 
-    def create_plan(self, user_request: str, memory_context: str) -> PlanExecution:
+    def create_plan(
+        self,
+        user_request: str,
+        memory_context: str,
+        effort: str = "standard",
+    ) -> PlanExecution:
         tools_info = [tool for tool in tool_registry.list_tools() if tool["planner_allowed"]]
         tools_desc = "\n".join(
             f"- {tool['name']}: {tool['description']} (params: {tool['parameters']})" for tool in tools_info
@@ -31,6 +36,7 @@ class AutonomousPlanner:
                 context=memory_context,
                 tools_description=tools_desc,
             ),
+            effort=effort,
         )
 
         try:

@@ -109,17 +109,30 @@ class LLMProvider:
         )
         return result
 
+    @staticmethod
+    def normalize_effort(effort: str) -> str:
+        normalized = effort.strip().lower() if isinstance(effort, str) else ""
+        return normalized if normalized in {"low", "standard", "high"} else "standard"
+
     def generate(
         self,
         system_prompt: str,
         user_prompt: str,
         history: Optional[List[Dict[str, str]]] = None,
+        effort: str = "standard",
     ) -> str:
+        effort = self.normalize_effort(effort)
+        effort_instruction = {
+            "low": "Favor direct solutions and concise explanations. Do not skip safety checks or required validation.",
+            "standard": "Use balanced planning, checking relevant constraints and providing enough detail to act.",
+            "high": "Use thorough planning: assess relevant requirements, constraints, risks, and alternatives before answering. Include useful supporting detail without revealing private reasoning.",
+        }[effort]
+        scoped_system_prompt = f"{system_prompt}\n\nConversation effort: {effort}. {effort_instruction}"
         self.last_error = None
         candidates = self._candidate_providers()
         for provider_name in candidates:
             try:
-                response = self._call_provider(provider_name, system_prompt, user_prompt, history or [])
+                response = self._call_provider(provider_name, scoped_system_prompt, user_prompt, history or [])
                 self.last_provider = provider_name
                 return response
             except ProviderRequestError as exc:
@@ -127,7 +140,7 @@ class LLMProvider:
                 logger.warning("LLM provider failed; trying fallback", extra={"provider": provider_name})
 
         self.last_provider = "local_fallback"
-        return self._local_reasoning_fallback(system_prompt, user_prompt, history)
+        return self._local_reasoning_fallback(scoped_system_prompt, user_prompt, history)
 
     def _candidate_providers(self) -> List[str]:
         requested = settings.DEFAULT_PROVIDER

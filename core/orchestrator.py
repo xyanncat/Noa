@@ -23,11 +23,13 @@ class Orchestrator:
         session_id: str = "default_session",
         persist_preferences: bool = False,
         event_handler: Optional[ExecutionEventHandler] = None,
+        effort: str = "standard",
     ) -> Dict[str, Any]:
-        plan: PlanExecution = brain.reason_and_plan(user_query, session_id)
+        effort = llm_provider.normalize_effort(effort)
+        plan: PlanExecution = brain.reason_and_plan(user_query, session_id, effort)
         self._emit(event_handler, "plan.created", {"plan": plan.dict()})
         executed_plan = autonomous_planner.execute_plan(plan, on_event=event_handler)
-        final_response = brain.synthesize_response(user_query, executed_plan, session_id)
+        final_response = brain.synthesize_response(user_query, executed_plan, session_id, effort)
         executed_plan.final_response = final_response
         memory_manager.record_plan_execution(session_id, executed_plan)
         memory_manager.store_interaction(
@@ -39,6 +41,7 @@ class Orchestrator:
         return {
             "query": user_query,
             "session_id": session_id,
+            "effort": effort,
             "response": final_response,
             "provider": {"used": llm_provider.last_provider},
             "plan": executed_plan.dict(),

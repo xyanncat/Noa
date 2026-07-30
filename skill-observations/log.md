@@ -24,3 +24,51 @@ Checkpoint after Todo 3 (2026-07-30): no reusable skill observations identified.
 **Suggested improvement:** Add a dependency-preflight step for native/mobile scaffolds that verifies every exact pin and its SDK compatibility manifest before the first workspace install.
 
 **Principle:** Validate package availability and ecosystem compatibility together; a syntactically valid manifest is not evidence that an installable dependency graph exists.
+
+
+### Observation 2: Separate build health from rendered UI validation
+
+**Status:** OPEN
+**Date:** 2026-07-30
+**Session context:** Responsive React operations-console repair and final frontend verification
+**Skill:** New skill candidate: frontend UI repair and verification
+**Type:** open-source
+**Phase/Area:** Validation evidence
+
+**Issue:** Static lint/build checks and an HTTP 200 response established source and server health, but the environment lacked a browser or screenshot tool for rendered visual and interaction review.
+
+**Suggested improvement:** Require UI-verification summaries to distinguish source/build, endpoint reachability, and browser-rendered checks, and explicitly disclose any unavailable visual evidence.
+
+**Principle:** Report validation at the fidelity actually observed; a successful build and reachable route do not prove every rendered interaction.
+
+
+### Observation 3: Completion checkpoint — no additional reusable observations
+
+**Status:** OPEN
+**Date:** 2026-07-30
+**Session context:** Final completion of the Noa web UI audit and repair task
+**Skill:** task-observer
+**Type:** open-source
+**Phase/Area:** Completion checkpoint
+
+**Issue:** No additional reusable workflow observation accumulated after the final validation-evidence observation.
+
+**Suggested improvement:** No skill change proposed at this checkpoint.
+
+**Principle:** Completion checkpoints should explicitly record when no further generalisable learning emerged.
+
+
+### Observation 4: Treat persistent previews as a separate deployment state
+
+**Status:** OPEN
+**Date:** 2026-07-30
+**Session context:** Replacing a React chat-composer control with an end-to-end conversation-effort setting
+**Skill:** New skill candidate: frontend UI repair and verification
+**Type:** open-source
+**Phase/Area:** Live-preview validation
+
+**Issue:** The edited source and production bundle contained the new UI, while the available persistent page preview continued to show the prior control. Automated fetching of the served source module returned HTTP 200 with an empty body, so it could not resolve whether the preview was cached or served by a separate runtime.
+
+**Suggested improvement:** Add a final preview-state check that separately reports source, bundle, served-module, and browser-session evidence; when the session cannot be programmatically reloaded, give the user one explicit hard-refresh action instead of implying the visible tab is current.
+
+**Principle:** A browser tab, a development server, and a built bundle are independent states; validate and communicate each one separately.
