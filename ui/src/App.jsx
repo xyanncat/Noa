@@ -3,7 +3,7 @@ import {
   Bot, Send, Brain, Cpu, Wrench, Sparkles, Terminal, Calendar, 
   Mail, Globe, Search, CheckCircle2, Clock, 
   Activity, Layers, Database, Plus, RefreshCw, Paperclip, 
-  Compass, Folder, History as HistoryIcon, ArrowUpRight, Lightbulb, Image, Mic, ChevronDown, MoreHorizontal, Link2, Download, HelpCircle
+  Compass, Folder, History as HistoryIcon, ArrowUpRight, Lightbulb, Image, Mic, ChevronDown, MoreHorizontal, Link2, Download, HelpCircle, Menu, X
 } from 'lucide-react';
 
 const API_BASE = "http://localhost:8000/api";
@@ -18,6 +18,7 @@ export default function App() {
   const [toolsList, setToolsList] = useState([]);
   const [autonomousTasks, setAutonomousTasks] = useState([]);
   const [systemHealth, setSystemHealth] = useState(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Selected tool state
   const [selectedTool, setSelectedTool] = useState('');
@@ -103,7 +104,7 @@ export default function App() {
     } catch (err) {
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: "I encountered an issue connecting to Noa backend engine." 
+        content: "Error connecting to Noa Engine backend (localhost:8000)." 
       }]);
     } finally {
       setIsLoading(false);
@@ -166,8 +167,16 @@ export default function App() {
   return (
     <div className="cortex-shell">
       
-      {/* LEFT SIDEBAR (Matching Cortex UI) */}
-      <aside className="cortex-sidebar">
+      {/* MOBILE BACKDROP OVERLAY */}
+      {mobileSidebarOpen && (
+        <div 
+          onClick={() => setMobileSidebarOpen(false)}
+          style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 95 }} 
+        />
+      )}
+
+      {/* LEFT SIDEBAR (Desktop Column / Mobile Drawer) */}
+      <aside className={`cortex-sidebar ${mobileSidebarOpen ? 'mobile-open' : ''}`}>
         
         {/* Brand Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -177,14 +186,17 @@ export default function App() {
             </div>
             <span style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--text-dark)' }}>Noa</span>
           </div>
-          <button style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}>
-            <Layers size={18} />
+          <button 
+            onClick={() => setMobileSidebarOpen(false)}
+            style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
+          >
+            <X size={20} />
           </button>
         </div>
 
         {/* New Chat Button */}
         <button 
-          onClick={() => setMessages([])}
+          onClick={() => { setMessages([]); setMobileSidebarOpen(false); }}
           style={{
             background: 'var(--btn-black)',
             color: '#ffffff',
@@ -237,7 +249,7 @@ export default function App() {
             return (
               <button
                 key={t.id}
-                onClick={() => setActiveTab(t.id)}
+                onClick={() => { setActiveTab(t.id); setMobileSidebarOpen(false); }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -270,24 +282,6 @@ export default function App() {
               ))}
             </div>
           </div>
-
-          <div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-light)', fontWeight: '700', marginBottom: '0.4rem', textTransform: 'uppercase' }}>Yesterday</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-              {["Summarize main differences...", "Need to negotiate an extension..."].map((item, idx) => (
-                <div key={idx} style={{ color: 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '0.2rem 0' }}>{item}</div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-light)', fontWeight: '700', marginBottom: '0.4rem', textTransform: 'uppercase' }}>7 days</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-              {["Generate 5 effective morning...", "As a non-technical PM, list...", "Help me allocate 8 hours..."].map((item, idx) => (
-                <div key={idx} style={{ color: 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '0.2rem 0' }}>{item}</div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Bottom Profile Pill */}
@@ -310,37 +304,44 @@ export default function App() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         
         {/* Top Workspace Header */}
-        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.75rem', borderBottom: '1px solid #f1f0f7' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: '#f8f6fc', padding: '0.35rem 0.75rem', borderRadius: '10px' }}>
-            <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.65rem' }}>✦</div>
-            <span style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-dark)' }}>Noa Core v1.0</span>
-            <ChevronDown size={14} color="var(--text-muted)" />
+        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.25rem', borderBottom: '1px solid #f1f0f7' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button 
+              onClick={() => setMobileSidebarOpen(true)}
+              style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--text-dark)' }}
+            >
+              <Menu size={22} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: '#f8f6fc', padding: '0.35rem 0.75rem', borderRadius: '10px' }}>
+              <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.65rem' }}>✦</div>
+              <span style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-dark)' }}>Noa Core v1.0</span>
+              <ChevronDown size={14} color="var(--text-muted)" />
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)' }}><MoreHorizontal size={18} /></button>
-            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)' }}><Link2 size={18} /></button>
-            <button style={{ border: '1px solid #e2e8f0', background: '#ffffff', padding: '0.4rem 0.85rem', borderRadius: '10px', fontSize: '0.82rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', color: 'var(--text-dark)' }}>
-              <Download size={14} /> Export chat
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button style={{ border: '1px solid #e2e8f0', background: '#ffffff', padding: '0.4rem 0.75rem', borderRadius: '10px', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', color: 'var(--text-dark)' }}>
+              <Download size={14} /> Export
             </button>
-            <button style={{ background: 'var(--btn-black)', color: '#ffffff', border: 'none', padding: '0.4rem 1rem', borderRadius: '10px', fontSize: '0.82rem', fontWeight: '600', cursor: 'pointer' }}>
+            <button style={{ background: 'var(--btn-black)', color: '#ffffff', border: 'none', padding: '0.4rem 0.85rem', borderRadius: '10px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer' }}>
               Upgrade
             </button>
           </div>
         </header>
 
         {/* MAIN DISPLAY CONTENT */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '2rem 3rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.5rem' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.25rem', paddingBottom: '4.5rem' }}>
           
           {/* TAB 1: EXPLORE CHAT INTERFACE */}
           {activeTab === 'chat' && (
             <>
               {messages.length === 0 ? (
-                /* Hero Section matching Cortex UI Image */
-                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                /* Hero Section */
+                <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
                   <div className="purple-orb" />
-                  <div style={{ fontSize: '1.25rem', color: '#a855f7', fontWeight: '600', marginTop: '1.25rem' }}>Hello, User</div>
-                  <h1 style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--text-dark)', marginTop: '0.2rem' }}>How can I assist you today?</h1>
+                  <div style={{ fontSize: '1.1rem', color: '#a855f7', fontWeight: '600', marginTop: '1rem' }}>Hello, User</div>
+                  <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: '800', color: 'var(--text-dark)', marginTop: '0.2rem' }}>How can I assist you today?</h1>
                 </div>
               ) : (
                 /* Active Chat Stream */
@@ -348,13 +349,13 @@ export default function App() {
                   {messages.map((m, idx) => (
                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                       <div style={{
-                        maxWidth: '80%',
-                        padding: '1rem 1.25rem',
-                        borderRadius: m.role === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+                        maxWidth: '88%',
+                        padding: '0.9rem 1.15rem',
+                        borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                         background: m.role === 'user' ? 'linear-gradient(135deg, #7c3aed, #a855f7)' : '#f8f6fc',
                         color: m.role === 'user' ? '#ffffff' : 'var(--text-dark)',
                         lineHeight: '1.6',
-                        fontSize: '0.92rem',
+                        fontSize: '0.9rem',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
                       }}>
                         {m.content}
@@ -370,7 +371,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* Floating Prompt Input Console (Cortex Style) */}
+              {/* Floating Prompt Input Console */}
               <div style={{ maxWidth: '850px', margin: '0 auto', width: '100%' }}>
                 <div className="cortex-prompt-box">
                   <textarea
@@ -383,7 +384,7 @@ export default function App() {
                   />
 
                   {/* Input Tools & Actions Bar */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <button className="pill-button pill-purple">
                         ⚛️ Deeper Research
@@ -412,8 +413,8 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Bottom Action Cards Grid matching Cortex UI */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', maxWidth: '850px', margin: '1rem auto 0 auto', width: '100%' }}>
+              {/* Bottom Action Cards Grid */}
+              <div className="cortex-card-grid">
                 <div className="cortex-card" onClick={() => handleSendMessage("Synthesize my notes into 5 key bullet points for the team.")}>
                   <Clock size={18} color="var(--text-muted)" />
                   <h4 style={{ fontSize: '0.9rem', fontWeight: '700', marginTop: '0.5rem', color: 'var(--text-dark)' }}>Synthesize Data</h4>
@@ -438,24 +439,18 @@ export default function App() {
           {/* TAB 2: MEMORY DECK */}
           {activeTab === 'memory' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '1.35rem', fontWeight: '800' }}>5-Layer Memory Deck</h2>
-                <span style={{ fontSize: '0.82rem', color: '#7c3aed', background: '#ede9fe', padding: '0.3rem 0.75rem', borderRadius: '12px', fontWeight: '700' }}>Active Vector Sync</span>
-              </div>
-
-              {/* Memory Add Form */}
-              <form onSubmit={handleAddMemory} style={{ background: '#f8f6fc', padding: '1rem', borderRadius: '16px', display: 'flex', gap: '0.75rem' }}>
+              <h2 style={{ fontSize: '1.35rem', fontWeight: '800' }}>5-Layer Memory Deck</h2>
+              <form onSubmit={handleAddMemory} style={{ background: '#f8f6fc', padding: '1rem', borderRadius: '16px', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <select value={newMemLayer} onChange={(e) => setNewMemLayer(e.target.value)} style={{ padding: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                   <option value="long_term">Long-Term Memory</option>
                   <option value="semantic">Semantic Memory (Vector)</option>
                 </select>
                 <input type="text" placeholder="Subject / Category" value={newMemSubject} onChange={(e) => setNewMemSubject(e.target.value)} style={{ padding: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-                <input type="text" placeholder="Fact details..." value={newMemFact} onChange={(e) => setNewMemFact(e.target.value)} style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                <input type="text" placeholder="Fact details..." value={newMemFact} onChange={(e) => setNewMemFact(e.target.value)} style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0', minWidth: '200px' }} />
                 <button type="submit" style={{ background: '#7c3aed', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', fontWeight: '700', cursor: 'pointer' }}>Save Card</button>
               </form>
 
-              {/* Memory Cards Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
                 <div className="cortex-card">
                   <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#7c3aed' }}>1. Working Memory</h3>
                   <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
@@ -496,7 +491,7 @@ export default function App() {
           {activeTab === 'tools' && (
             <div style={{ maxWidth: '900px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <h2 style={{ fontSize: '1.35rem', fontWeight: '800' }}>12 Tool Execution Deck</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
                 {toolsList.map((t, idx) => (
                   <div key={idx} className="cortex-card" onClick={() => setSelectedTool(t.name)}>
                     <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: '#7c3aed' }}>{t.name}</h4>
@@ -525,17 +520,43 @@ export default function App() {
             </div>
           )}
 
-          {/* Footer Sub-bar matching Cortex UI */}
-          <footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f0f7', paddingTop: '1rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            <div>Join the Noa community for more insights <a href="#" style={{ color: '#7c3aed', fontWeight: '700', textDecoration: 'none' }}>Join Discord</a></div>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: '600' }}>文A</button>
-              <button style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)' }}><HelpCircle size={16} /></button>
-            </div>
-          </footer>
-
         </div>
       </div>
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <nav className="mobile-bottom-nav">
+        {[
+          { id: 'chat', label: 'Explore', icon: Compass },
+          { id: 'memory', label: 'Memory', icon: Brain },
+          { id: 'planner', label: 'Planner', icon: Cpu },
+          { id: 'tools', label: 'Tools', icon: Wrench },
+          { id: 'agents', label: 'Tasks', icon: Activity }
+        ].map(t => {
+          const Icon = t.icon;
+          const active = activeTab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.2rem',
+                border: 'none',
+                background: 'transparent',
+                color: active ? '#7c3aed' : 'var(--text-muted)',
+                fontSize: '0.7rem',
+                fontWeight: active ? '700' : '500',
+                cursor: 'pointer'
+              }}
+            >
+              <Icon size={18} />
+              {t.label}
+            </button>
+          );
+        })}
+      </nav>
 
     </div>
   );

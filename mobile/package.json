@@ -1,0 +1,31 @@
+{
+  "name": "@noa/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "export": "expo export --platform all",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noa/api-client": "file:../shared",
+    "expo": "57.0.9",
+    "expo-audio": "57.0.3",
+    "expo-camera": "57.0.3",
+    "expo-router": "57.0.9",
+    "expo-speech": "57.0.1",
+    "expo-sqlite": "57.0.1",
+    "react": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-safe-area-context": "5.7.0",
+    "react-native-screens": "4.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "typescript": "5.7.3"
+  }
+}

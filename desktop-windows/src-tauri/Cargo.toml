@@ -1,0 +1,23 @@
+[package]
+name = "noa_desktop"
+version = "0.1.0"
+description = "Noa native Windows desktop overlay"
+authors = ["Noa"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "noa_desktop_lib"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "noa-desktop"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2.3.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.8.0", features = ["tray-icon"] }
+tauri-plugin-global-shortcut = "2.3.0"
+tauri-plugin-notification = "2.3.0"

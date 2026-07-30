@@ -38,7 +38,7 @@ body {
   overflow: hidden;
 }
 
-/* App Main Container Shell matching Cortex UI */
+/* App Main Container Shell (Desktop Default) */
 .cortex-shell {
   width: 100%;
   max-width: 1440px;
@@ -48,6 +48,7 @@ body {
   box-shadow: 0 25px 70px rgba(100, 80, 160, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.6);
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
 /* Sidebar Styling */
@@ -59,17 +60,19 @@ body {
   flex-direction: column;
   padding: 1.25rem 1rem;
   gap: 1.25rem;
+  transition: transform 0.3s ease;
+  z-index: 100;
 }
 
-/* 3D Iridescent Floating Purple Orb Animation */
+/* 3D Iridescent Floating Purple Orb */
 @keyframes orbFloat {
   0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 15px 30px rgba(168, 85, 247, 0.4)); }
-  50% { transform: translateY(-10px) scale(1.05); filter: drop-shadow(0 25px 40px rgba(168, 85, 247, 0.6)); }
+  50% { transform: translateY(-8px) scale(1.04); filter: drop-shadow(0 25px 40px rgba(168, 85, 247, 0.6)); }
 }
 
 .purple-orb {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #f472b6 0%, #c084fc 40%, #7c3aed 85%, #4c1d95 100%);
   animation: orbFloat 5s ease-in-out infinite;
@@ -116,6 +119,15 @@ body {
 }
 
 /* Action Cards Grid */
+.cortex-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 850px;
+  margin: 1rem auto 0 auto;
+  width: 100%;
+}
+
 .cortex-card {
   background: #ffffff;
   border: 1px solid #f1f0f7;
@@ -130,6 +142,65 @@ body {
   transform: translateY(-3px);
   border-color: #d8b4fe;
   box-shadow: 0 15px 35px rgba(168, 85, 247, 0.12);
+}
+
+/* --- SMARTPHONE & MOBILE RESPONSIVE ADAPTATIONS --- */
+@media (max-width: 768px) {
+  body {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .cortex-shell {
+    height: 100vh;
+    border-radius: 0;
+    max-width: 100%;
+    box-shadow: none;
+  }
+
+  .cortex-sidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 280px;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .cortex-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .cortex-card-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .purple-orb {
+    width: 70px;
+    height: 70px;
+  }
+
+  /* Mobile Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    justify-content: space-around;
+    z-index: 90;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
 }
 
 /* Custom Scrollbars */

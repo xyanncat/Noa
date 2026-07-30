@@ -1,7 +1,11 @@
+import asyncio
+import base64
+import binascii
 import hmac
 import logging
 import sys
 import time
+import uuid
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -12,11 +16,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from agents.autonomous_agent import autonomous_agent
 from agents.scheduler import scheduler
@@ -61,6 +65,13 @@ class RateLimiter:
 rate_limiter = RateLimiter(settings.RATE_LIMIT_PER_MINUTE)
 
 
+def _is_api_key_valid(api_key: Optional[str]) -> bool:
+    """Use the same constant-time key check for HTTP and WebSocket clients."""
+    if not settings.API_AUTH_ENABLED:
+        return True
+    return bool(settings.API_KEY and api_key and hmac.compare_digest(api_key, settings.API_KEY))
+
+
 def require_api_key(x_api_key: Optional[str] = Header(default=None, alias="X-API-Key")) -> None:
     if not settings.API_AUTH_ENABLED:
         return
@@ -69,7 +80,7 @@ def require_api_key(x_api_key: Optional[str] = Header(default=None, alias="X-API
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="API authentication is enabled but NOA_API_KEY is not configured.",
         )
-    if not x_api_key or not hmac.compare_digest(x_api_key, settings.API_KEY):
+    if not _is_api_key_valid(x_api_key):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing API key.")
 
 
@@ -160,6 +171,11 @@ class VoiceRequest(BaseModel):
     text: str = Field(min_length=1, max_length=5000)
 
 
+class VoiceTranscriptionRequest(BaseModel):
+    audio_base64: str = Field(min_length=1, max_length=15_000_000)
+    mime_type: str = Field(default="audio/m4a", max_length=100)
+
+
 protected: List[Any] = [Depends(require_api_key), Depends(rate_limiter.enforce)]
 
 
@@ -213,6 +229,90 @@ def chat_endpoint(request: ChatRequest):
         request.session_id,
         persist_preferences=request.remember,
     )
+
+
+@app.websocket("/api/ws")
+async def websocket_chat_endpoint(websocket: WebSocket):
+    """Authenticated, event-oriented chat channel for desktop and mobile clients.
+
+    Authentication is sent as the first WebSocket message instead of a query
+    parameter so API keys do not end up in URLs, proxy logs, or deep links.
+    """
+    await websocket.accept()
+    session_id = "default_session"
+    try:
+        try:
+            authentication = await asyncio.wait_for(websocket.receive_json(), timeout=10)
+        except TimeoutError:
+            await websocket.send_json({"type": "error", "data": {"code": "auth_timeout", "message": "Authenticate within 10 seconds."}})
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+
+        if not isinstance(authentication, dict) or authentication.get("type") != "authenticate":
+            await websocket.send_json({"type": "error", "data": {"code": "authentication_required", "message": "The first WebSocket message must authenticate."}})
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+        if settings.API_AUTH_ENABLED and not _is_api_key_valid(authentication.get("api_key")):
+            await websocket.send_json({"type": "error", "data": {"code": "unauthorized", "message": "Invalid or missing API key."}})
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+
+        proposed_session = authentication.get("session_id")
+        if isinstance(proposed_session, str) and proposed_session.strip():
+            session_id = proposed_session[:64]
+        await websocket.send_json(
+            {"type": "connection.ready", "data": {"protocol_version": "1.0", "session_id": session_id}}
+        )
+
+        while True:
+            incoming = await websocket.receive_json()
+            if not isinstance(incoming, dict):
+                await websocket.send_json({"type": "error", "data": {"code": "invalid_message", "message": "WebSocket messages must be JSON objects."}})
+                continue
+            if incoming.get("type") == "ping":
+                await websocket.send_json({"type": "pong", "data": {"timestamp": time.time()}})
+                continue
+            if incoming.get("type") != "chat.request":
+                await websocket.send_json({"type": "error", "data": {"code": "unknown_message", "message": "Supported messages are chat.request and ping."}})
+                continue
+
+            request_id = str(incoming.get("request_id") or uuid.uuid4().hex)[:128]
+            try:
+                chat_request = ChatRequest(
+                    message=incoming.get("message", ""),
+                    session_id=incoming.get("session_id") or session_id,
+                    remember=bool(incoming.get("remember", False)),
+                )
+            except ValidationError as exc:
+                await websocket.send_json(
+                    {"type": "error", "request_id": request_id, "data": {"code": "validation_error", "message": "Chat request validation failed.", "details": exc.errors()}}
+                )
+                continue
+
+            await websocket.send_json({"type": "chat.accepted", "request_id": request_id, "data": {"session_id": chat_request.session_id}})
+            loop = asyncio.get_running_loop()
+
+            def forward_event(event_type: str, data: Dict[str, Any]) -> None:
+                future = asyncio.run_coroutine_threadsafe(
+                    websocket.send_json({"type": event_type, "request_id": request_id, "data": data}),
+                    loop,
+                )
+                future.result(timeout=settings.LLM_TIMEOUT_SECONDS + 15)
+
+            try:
+                response = await asyncio.to_thread(
+                    orchestrator.process_request,
+                    chat_request.message.strip(),
+                    chat_request.session_id,
+                    chat_request.remember,
+                    forward_event,
+                )
+                await websocket.send_json({"type": "chat.completed", "request_id": request_id, "data": response})
+            except Exception:
+                logger.exception("WebSocket chat request failed", extra={"request_id": request_id})
+                await websocket.send_json({"type": "error", "request_id": request_id, "data": {"code": "chat_failed", "message": "Noa could not complete this chat request."}})
+    except WebSocketDisconnect:
+        logger.info("Noa WebSocket disconnected")
 
 
 @app.get("/api/memory", dependencies=protected)
@@ -294,6 +394,22 @@ def analyze_image_endpoint(request: VisionRequest):
 @app.post("/api/voice/synthesize", dependencies=protected)
 def synthesize_voice_endpoint(request: VoiceRequest):
     return voice_engine.synthesize_speech(request.text)
+
+
+@app.post("/api/voice/transcribe", dependencies=protected)
+def transcribe_voice_endpoint(request: VoiceTranscriptionRequest):
+    try:
+        audio_bytes = base64.b64decode(request.audio_base64, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="audio_base64 must be valid base64 audio data.") from exc
+    if not audio_bytes:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Audio data cannot be empty.")
+    return {
+        "success": True,
+        "transcript": voice_engine.transcribe_audio(audio_bytes),
+        "mime_type": request.mime_type,
+        "transcription_mode": "stub",
+    }
 
 
 if __name__ == "__main__":

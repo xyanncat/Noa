@@ -1,0 +1,11 @@
+{
+  "identifier": "main-capability",
+  "description": "Permissions required by Noa's primary Windows overlay.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "notification:default"
+  ]
+}

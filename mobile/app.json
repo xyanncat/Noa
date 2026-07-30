@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Noa",
+    "slug": "noa-mobile",
+    "version": "0.1.0",
+    "scheme": "noa",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.noa.mobile"
+    },
+    "android": {
+      "package": "com.noa.mobile",
+      "permissions": ["CAMERA", "RECORD_AUDIO", "POST_NOTIFICATIONS"]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Noa to use the camera for vision requests.",
+          "microphonePermission": "Allow Noa to use the microphone while capturing video.",
+          "recordAudioAndroid": true,
+          "barcodeScannerEnabled": false
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow Noa to record a voice request.",
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      "expo-sqlite"
+    ],
+    "experiments": { "typedRoutes": true }
+  }
+}

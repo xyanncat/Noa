@@ -15,6 +15,13 @@ data/*.db-wal
 data/*.db-shm
 *.log
 
-# Frontend dependencies and build output
+# JavaScript workspace dependencies and build output
+node_modules/
 ui/node_modules/
 ui/dist/
+desktop-windows/node_modules/
+desktop-windows/dist/
+desktop-windows/target/
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/

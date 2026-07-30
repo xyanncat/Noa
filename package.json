@@ -1,0 +1,18 @@
+{
+  "name": "noa-ai-engine",
+  "version": "2.1.0",
+  "private": true,
+  "workspaces": ["shared", "desktop-windows", "mobile", "ui"],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test:sdk": "npm run test --workspace @noa/api-client",
+    "desktop:dev": "npm run tauri:dev --workspace @noa/desktop-windows",
+    "desktop:build": "npm run tauri:build --workspace @noa/desktop-windows",
+    "mobile:start": "npm run start --workspace @noa/mobile",
+    "mobile:export": "npm run export --workspace @noa/mobile"
+  },
+  "engines": {
+    "node": ">=20.18.0",
+    "npm": ">=10.8.0"
+  }
+}

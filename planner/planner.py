@@ -1,12 +1,16 @@
 import json
 import time
-from typing import Any, Dict, List
+from collections.abc import Callable
+from typing import Any, Dict, List, Optional
 
 from config.prompts import PLANNING_PROMPT_TEMPLATE
 from config.settings import settings
 from models.llm import llm_provider
 from planner.plan_models import PlanExecution, PlanStep, StepResult
 from tools.base import tool_registry
+
+
+PlanEventHandler = Callable[[str, Dict[str, Any]], None]
 
 
 class AutonomousPlanner:
@@ -86,11 +90,20 @@ class AutonomousPlanner:
             warnings=[warning],
         )
 
-    def execute_plan(self, plan: PlanExecution) -> PlanExecution:
+    def execute_plan(
+        self,
+        plan: PlanExecution,
+        on_event: Optional[PlanEventHandler] = None,
+    ) -> PlanExecution:
         plan.status = "executing"
         failures = 0
         for step in plan.steps:
             started = time.perf_counter()
+            if on_event:
+                on_event(
+                    "plan.step_started",
+                    {"execution_id": plan.execution_id, "step": step.dict()},
+                )
             if step.tool_name == "none":
                 result = StepResult(
                     step_number=step.step_number,
@@ -121,6 +134,11 @@ class AutonomousPlanner:
                     duration_ms=round((time.perf_counter() - started) * 1000),
                 )
             plan.results.append(result)
+            if on_event:
+                on_event(
+                    "plan.step_completed",
+                    {"execution_id": plan.execution_id, "result": result.dict()},
+                )
 
         plan.completed_at = time.time()
         plan.status = "completed" if failures == 0 else "completed_with_errors"
