@@ -18,3 +18,4 @@ local.properties
 # Release signing material
 *.jks
 *.keystore
+noa-release.local.properties

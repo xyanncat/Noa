@@ -4,7 +4,7 @@
 
 ### *A Friendly Autonomous AI System with 5-Layer Memory Architecture & Multi-Platform Client Suite*
 
-[![GitHub Release](https://img.shields.io/github/v/release/xyanncat/Noa?color=7c3aed&style=for-the-badge)](https://github.com/xyanncat/Noa/releases/tag/v1.0.0)
+[![GitHub Release](https://img.shields.io/github/v/release/xyanncat/Noa?color=7c3aed&style=for-the-badge)](https://github.com/xyanncat/Noa/releases/latest)
 [![License](https://img.shields.io/github/license/xyanncat/Noa?color=38bdf8&style=for-the-badge)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.14+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -124,53 +124,64 @@ Noa/
 │   ├── src-tauri/              # Rust native layer (Alt+Space Spotlight hotkey & System Tray)
 │   └── src/                    # Desktop UI React App
 │
-├── mobile/                     # Smartphone App (React Native + Expo for iOS & Android)
-│   ├── app/                    # Expo Router screens (Voice Assistant & Camera OCR)
-│   └── components/
+├── mobile/                     # Smartphone App (conventional React Native Android)
+│   ├── App.tsx                 # Native mobile chat client
+│   └── android/                # Signed arm64 Android Gradle project
 │
 └── shared/                     # Shared TypeScript SDK (@noa/api-client)
 ```
 
 ---
 
-### ⚡ Option A: Automated One-Click Installation
+### ⚡ Option A: Interactive Installation & Build Hub
 1. Clone or download the repository.
-2. Double click **`install.bat`** (Windows) or run `./install.sh` (Linux/macOS).
-3. Start the services:
-   - **Backend Server**: `python api/main.py`
-   - **Web Interface**: `cd ui && npm run dev`
+2. Run **`install.bat`** (Windows) or `./install.sh` (Linux/macOS) to access the interactive installation menu:
+   - **[1] Install All System Dependencies** (Python + Node.js Workspaces)
+   - **[2] Build Smartphone Package** (`Noa-v2.2.0-Android-arm64.apk`)
+   - **[3] Build Desktop Package** (`Noa-v2.2.0-Windows-x64-Setup.exe`)
+   - **[4] Build Full Multi-Platform Release** (APK + EXE + SHA-256 Metadata)
+   - **[5] Start Local Services** (Backend API + Web UI)
 
-### 📱 Option B: Direct Smartphone Installation — No Expo Go
+3. Alternatively, build packages directly via npm commands:
+   - **Build Smartphone APK**: `npm run build:mobile`
+   - **Build Desktop Windows EXE**: `npm run build:desktop`
+   - **Build Full Release Suite**: `npm run build:release`
 
-#### 1. Install Noa as a Progressive Web App (Android & iOS)
+### 📱 Option B: Direct Smartphone Installation
+
+#### 1. Install the Signed Android APK
+1. Open the [GitHub Releases page](https://github.com/xyanncat/Noa/releases) or the local [`release-assets/`](file:///d:/Github/ai-engine/release-assets/) directory.
+2. Download `Noa-v2.2.0-Android-arm64.apk`.
+3. Tap the downloaded APK on your Android device to install it directly.
+
+#### 2. Progressive Web App (Android & iOS)
 1. Open the deployed Noa web interface in Chrome on Android or Safari on iOS.
 2. Choose **Add to Home Screen** (or **Install app** in Chrome).
-3. Launch the new **Noa** home-screen icon for a standalone, full-screen experience. The app shell remains available offline after the first successful load.
-
-#### 2. Install the Signed Android APK
-1. Open the [GitHub Releases page](https://github.com/xyanncat/Noa/releases) on an Android device.
-2. Download the `Noa-v2.2.0-Android-arm64.apk` asset for the selected release.
-3. If Android asks, allow installation from the browser or file manager, then tap the downloaded APK to install it. No Expo Go account or app is required.
-
-> [!NOTE]
-> iOS does not allow direct APK installation. Use the PWA path above for a home-screen Noa experience on iPhone and iPad.
+3. Launch the **Noa** home-screen icon for a standalone experience.
 
 ### 💻 Windows Direct Installation
 
-1. Open the [GitHub Releases page](https://github.com/xyanncat/Noa/releases).
-2. Download `Noa-v2.2.0-Windows-x64-Setup.exe` from the desired release.
-3. Run the installer. It contains the Tauri application and an offline Microsoft WebView2 installer, so it does not depend on an existing WebView2 download.
+1. Open the [GitHub Releases page](https://github.com/xyanncat/Noa/releases) or local [`release-assets/`](file:///d:/Github/ai-engine/release-assets/) folder.
+2. Download `Noa-v2.2.0-Windows-x64-Setup.exe`.
+3. Run the installer. It contains the Tauri application and an offline Microsoft WebView2 runtime installer.
 
 ### 🔐 Maintainer Release Setup
 
-Publishing a GitHub Release tagged `v2.2.0` runs `.github/workflows/release-binaries.yml`, verifies the version metadata, and attaches the signed Android and Windows artifacts. Before publishing, configure these repository secrets:
+Pushing the version tag `v2.2.0` starts `.github/workflows/release-binaries.yml`. It verifies version metadata, builds the signed Android and Windows binaries on GitHub-hosted runners, then creates or updates the GitHub Release with the direct-download assets. Before pushing the tag, configure these repository secrets:
 
 - `NOA_ANDROID_KEYSTORE_BASE64`: Base64-encoded release `.jks` / `.keystore` file.
 - `NOA_ANDROID_KEYSTORE_PASSWORD`: Keystore password.
 - `NOA_ANDROID_KEY_ALIAS`: Signing-key alias.
 - `NOA_ANDROID_KEY_PASSWORD`: Signing-key password.
 
-The Android job intentionally fails rather than publishing an unsigned or debug-signed APK when any signing secret is missing.
+The Android job intentionally fails rather than publishing an unsigned or debug-signed APK when any signing secret is missing. After adding the secrets, push the release tag:
+
+```bash
+git tag v2.2.0
+git push origin v2.2.0
+```
+
+GitHub Actions creates the release and attaches both direct-download files.
 
 ### 💻 Option C: Manual Installation Steps
 

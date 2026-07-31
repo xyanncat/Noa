@@ -1,0 +1,16 @@
+{
+    "android": {
+        "path": "d:\\Github\\ai-engine\\release-assets\\Noa-v2.2.0-Android-arm64.apk",
+        "sha256": "C71BB53350D8CF1BFF8F1AA615A31914DF7C2738BAA5FB2A7A2345AEB9340CEE"
+    },
+    "windows": {
+        "path": "d:\\Github\\ai-engine\\release-assets\\Noa-v2.2.0-Windows-x64-Setup.exe",
+        "sha256": "FC2F132B03A32925F1BBBB4DFD7707D221C6619AAAB1F6F917D742294214D5F8"
+    },
+    "toolVersions": {
+        "node": "v24.18.0",
+        "npm": "11.16.0",
+        "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+        "java": "openjdk version \"17.0.20\" 2026-07-21"
+    }
+}

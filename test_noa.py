@@ -13,6 +13,8 @@ from core.orchestrator import orchestrator
 from agents.autonomous_agent import autonomous_agent
 
 def run_tests():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     print("=== Testing Noa Autonomous AI Engine ===")
     
     # 1. Test Tools Registry

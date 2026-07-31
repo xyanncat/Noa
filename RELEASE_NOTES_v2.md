@@ -1,94 +1,40 @@
-# Noa Autonomous AI Engine — Release v2.1.0 (Complete Installation Methods)
+# Noa Autonomous AI Engine — Release v2.2.0 (Multi-Platform Direct Release)
 
-🎉 **Noa v2.1.0** includes complete automated installers (`install.bat` / `install.sh`) and step-by-step installation instructions for all platforms!
-
----
-
-## ⚡ Method 1: Automated One-Click Installation
-
-### Windows One-Click Setup
-1. Clone or download the source code zip from this release.
-2. Double click **`install.bat`** to automatically install all Python and Node.js dependencies.
-3. Start the system:
-   - **Backend Server**: `python api/main.py`
-   - **Web Interface**: `cd ui && npm run dev`
-
-### Linux / macOS Setup
-```bash
-git clone https://github.com/xyanncat/Noa.git
-cd Noa
-chmod +x install.sh
-./install.sh
-```
+🎉 **Noa v2.2.0** is officially released! Includes pre-compiled direct-installation packages for both **Windows Desktop** and **Smartphone (Android)**, alongside interactive installation & build tools.
 
 ---
 
-## 🛠️ Method 2: Step-by-Step Manual Installation
+## 📦 Direct Installer Packages
 
-### 1. ⚙️ Noa Backend Engine Setup (Python)
-```bash
-# Clone Repository
-git clone https://github.com/xyanncat/Noa.git
-cd Noa
-
-# Install Dependencies
-pip install -r requirements.txt
-
-# Launch Backend Server
-python api/main.py
-# Server running at http://localhost:8000
-```
-
-### 2. 🖥️ Noa Web Interface Setup (React + Vite)
-```bash
-# Navigate to UI directory
-cd ui
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-# Interface running at http://localhost:5173
-```
-
-### 3. 💻 Noa Windows Desktop Setup (Tauri v2 + Rust)
-```bash
-cd desktop-windows
-
-# Install dependencies
-npm install
-
-# Run Desktop Client (Requires Rust & WebView2)
-npm run tauri dev
-```
-
-### 4. 📱 Noa Smartphone App Setup (iOS & Android)
-#### Option 4A: Instant Smartphone Testing via Expo Go (No Build Required)
-1. Download **Expo Go** on your smartphone:
-   - 🤖 **Android**: [Download on Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
-   - 🍎 **iOS**: [Download on Apple App Store](https://apps.apple.com/app/expo-go/id982107779)
-2. Start Expo server on your computer:
-   ```bash
-   cd mobile && npx expo start --tunnel
-   ```
-3. Scan the generated QR code with your phone camera or Expo Go app to launch Noa on your smartphone!
-
-#### Option 4B: Standalone Build
-```bash
-cd mobile
-npm install
-npx expo start
-```
+| Target Platform | Package File | Location | Description | SHA-256 Checksum |
+| :--- | :--- | :--- | :--- | :--- |
+| **Android Smartphone** | `Noa-v2.2.0-Android-arm64.apk` | [`release-assets/`](file:///d:/Github/ai-engine/release-assets/Noa-v2.2.0-Android-arm64.apk) | Signed ARM64 Android installation package | `C71BB53350D8CF1BFF8F1AA615A31914DF7C2738BAA5FB2A7A2345AEB9340CEE` |
+| **Windows Desktop** | `Noa-v2.2.0-Windows-x64-Setup.exe` | [`release-assets/`](file:///d:/Github/ai-engine/release-assets/Noa-v2.2.0-Windows-x64-Setup.exe) | Offline NSIS Windows installer (Tauri v2 + WebView2) | `FC2F132B03A32925F1BBBB4DFD7707D221C6619AAAB1F6F917D742294214D5F8` |
+| **Verification Metadata** | `build-metadata.json` | [`release-assets/`](file:///d:/Github/ai-engine/release-assets/build-metadata.json) | Hash verification & build toolchain metadata | — |
 
 ---
 
-## 📦 Released Packages Summary
+## ⚡ Interactive Installation & Build Hub
 
-- **`install.bat`**: Automated one-click Windows installer.
-- **`install.sh`**: Automated Unix/macOS installer.
-- **`requirements.txt`**: Python dependencies list.
-- **`backend/`**: Python FastAPI Engine with 5 Memory Layers.
-- **`ui/`**: Responsive Cortex Web Interface.
-- **`desktop-windows/`**: Tauri v2 Rust Windows desktop app.
-- **`mobile/`**: React Native Expo iOS & Android app.
+Double-click **`install.bat`** (Windows) or execute `./install.sh` (Linux/macOS) to access the installation menu:
+
+1. **Install All System Dependencies** (Python + Node.js Workspaces)
+2. **Build Smartphone Package** (`Noa-v2.2.0-Android-arm64.apk`)
+3. **Build Desktop Package** (`Noa-v2.2.0-Windows-x64-Setup.exe`)
+4. **Build Full Release Suite** (APK + EXE + Metadata)
+5. **Start Local Services** (Backend API + Web UI)
+
+---
+
+## 🛠️ Direct npm Command Line Build Shortcuts
+
+```bash
+# Build Smartphone Android APK
+npm run build:mobile
+
+# Build Desktop Windows Setup EXE
+npm run build:desktop
+
+# Build Complete Release Suite (APK + EXE + Checksums)
+npm run build:release
+```

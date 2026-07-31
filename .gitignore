@@ -15,13 +15,17 @@ data/*.db-wal
 data/*.db-shm
 *.log
 
+# Large binary installer assets (published via GitHub Releases)
+release-assets/*.apk
+release-assets/*.exe
+desktop-windows/src-tauri/target/
+
 # JavaScript workspace dependencies and build output
 node_modules/
 ui/node_modules/
 ui/dist/
 desktop-windows/node_modules/
 desktop-windows/dist/
-desktop-windows/target/
 mobile/node_modules/
-mobile/.expo/
 mobile/dist/
+shared/dist/

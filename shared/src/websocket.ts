@@ -40,7 +40,7 @@ export class NoaSocket {
         this.send({ type: 'authenticate', api_key: this.config.apiKey, session_id: this.config.sessionId });
         resolve();
       };
-      socket.onmessage = (event) => {
+      socket.onmessage = (event: { data: string }) => {
         try {
           this.publish(JSON.parse(event.data) as NoaSocketEvent);
         } catch {
@@ -48,7 +48,7 @@ export class NoaSocket {
         }
       };
       socket.onerror = () => reject(new Error('Noa WebSocket connection failed.'));
-      socket.onclose = (event) => {
+      socket.onclose = (event: { code: number; reason?: string }) => {
         if (event.code !== 1000 && event.code !== 1005) {
           this.publish({ type: 'error', data: { code: 'socket_closed', message: event.reason || `Socket closed (${event.code}).` } });
         }

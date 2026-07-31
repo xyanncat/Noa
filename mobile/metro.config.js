@@ -1,11 +1,26 @@
 const path = require('path');
-const { getDefaultConfig } = require('expo/metro-config');
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
-const config = getDefaultConfig(__dirname);
-config.watchFolders = [path.resolve(__dirname, '../shared')];
-config.resolver.nodeModulesPaths = [
-  path.resolve(__dirname, 'node_modules'),
-  path.resolve(__dirname, '../node_modules'),
-];
+const root = path.resolve(__dirname, '..');
 
-module.exports = config;
+/**
+ * Metro configuration for the conventional React Native Android app.
+ * https://reactnative.dev/docs/metro
+ *
+ * In npm workspaces, Metro must watch the workspace root so hoisted node_modules
+ * (like @babel/runtime) and shared dependencies are properly resolved.
+ *
+ * @type {import('@react-native/metro-config').MetroConfig}
+ */
+const config = {
+  projectRoot: __dirname,
+  watchFolders: [root],
+  resolver: {
+    nodeModulesPaths: [
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(root, 'node_modules'),
+    ],
+  },
+};
+
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);

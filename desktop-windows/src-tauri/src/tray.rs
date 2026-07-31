@@ -1,7 +1,7 @@
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
     tray::TrayIconBuilder,
-    AppHandle, Manager, Runtime,
+    AppHandle, Runtime,
 };
 
 use crate::hotkey;

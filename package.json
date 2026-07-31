@@ -5,6 +5,9 @@
   "workspaces": ["shared", "desktop-windows", "mobile", "ui"],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
+    "build:desktop": "npm run desktop:build",
+    "build:mobile": "npm run android:apk --workspace @noa/mobile",
+    "build:release": "powershell -ExecutionPolicy Bypass -File .\\tools\\build-local-release.ps1",
     "test:sdk": "npm run test --workspace @noa/api-client",
     "desktop:dev": "npm run tauri:dev --workspace @noa/desktop-windows",
     "desktop:build": "npm run tauri:build --workspace @noa/desktop-windows",

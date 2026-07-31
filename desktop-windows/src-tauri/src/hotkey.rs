@@ -1,6 +1,6 @@
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, Runtime};
 
-pub fn show_overlay(app: &AppHandle) -> Result<(), String> {
+pub fn show_overlay<R: Runtime>(app: &AppHandle<R>) -> Result<(), String> {
     let window = app
         .get_webview_window("main")
         .ok_or_else(|| "Noa overlay window was not created.".to_string())?;
@@ -9,7 +9,7 @@ pub fn show_overlay(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-pub fn hide_overlay(app: &AppHandle) -> Result<(), String> {
+pub fn hide_overlay<R: Runtime>(app: &AppHandle<R>) -> Result<(), String> {
     let window = app
         .get_webview_window("main")
         .ok_or_else(|| "Noa overlay window was not created.".to_string())?;
